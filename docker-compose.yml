@@ -1,0 +1,62 @@
+version: "3.7"
+services:
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - server
+      - client
+
+  client:
+    container_name: client
+    hostname: client
+    image: client
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - "./services/client:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    ports:
+      - 3001:3000
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_SERVICE_URL=http://localhost:8080
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - server
+
+  server:
+    container_name: server
+    hostname: server
+    image: server
+    build:
+      context: ./services/server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - "./services/server:/usr/src/app"
+    ports:
+      - 5001:5000
+    environment:
+      - COMPOSE_CONVERT_WINDOWS_PATHS=1
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/dev_db
+      - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/dev_test_db
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    hostname: db
+    image: db
+    build:
+      context: ./services/db
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
