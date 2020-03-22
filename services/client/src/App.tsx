@@ -1,6 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { Button } from "react-bootstrap";
 
 const App: React.FC = () => {
   return (
@@ -18,9 +19,12 @@ const App: React.FC = () => {
         >
           Learn React
         </a>
+        <Button variant="success" onClick={() => alert("hey guys")}>
+          Success
+        </Button>
       </header>
     </div>
   );
-}
+};
 
 export default App;
