@@ -1,7 +1,8 @@
 # dva
 
 ## Prerequisites
-
+- [`Node.js v 12.x`](https://nodejs.org/en/)
+- [`Yarn`](https://classic.yarnpkg.com/en/docs/install)
 - You will need both [`docker`](https://www.docker.com/products/docker-desktop) and `docker-compose` installed.
 
 ## Usage
