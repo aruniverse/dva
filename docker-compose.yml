@@ -12,9 +12,9 @@ services:
       - client
 
   client:
-    container_name: client
-    hostname: client
-    image: client
+    container_name: dva_client
+    hostname: dva_client
+    image: dva_client
     build:
       context: ./services/client
       dockerfile: Dockerfile.dev
@@ -22,7 +22,7 @@ services:
       - "./services/client:/usr/src/app"
       - "/usr/src/app/node_modules"
     ports:
-      - 3001:3000
+      - 3000:3000
     environment:
       - NODE_ENV=development
       - REACT_APP_SERVICE_URL=http://localhost:8080
@@ -31,16 +31,16 @@ services:
       - server
 
   server:
-    container_name: server
-    hostname: server
-    image: server
+    container_name: dva_server
+    hostname: dva_server
+    image: dva_server
     build:
       context: ./services/server
       dockerfile: Dockerfile.dev
     volumes:
       - "./services/server:/usr/src/app"
     ports:
-      - 5001:5000
+      - 8000:8000
     environment:
       - COMPOSE_CONVERT_WINDOWS_PATHS=1
       - DATABASE_URL=postgres://postgres:postgres@db:5432/dev_db
@@ -49,14 +49,14 @@ services:
       - db
 
   db:
-    container_name: db
-    hostname: db
-    image: db
+    container_name: dva_db
+    hostname: dva_db
+    image: dva_db
     build:
       context: ./services/db
       dockerfile: Dockerfile.dev
     ports:
-      - 5435:5432
+      - 5432:5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

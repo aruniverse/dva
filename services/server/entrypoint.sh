@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec ./manage.py runserver 5000
+exec ./manage.py runserver
