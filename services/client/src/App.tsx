@@ -1,29 +1,20 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-// import { Button } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
+import { Helmet } from "react-helmet";
+import { Router } from "react-router";
+import Routes from "./Routes";
+import { createBrowserHistory } from "history";
 
-const App: React.FC = () => {
+const history = createBrowserHistory();
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <Button variant="success" onClick={() => alert("hey guys")}>
-          Success
-        </Button>
-      </header>
+    <div>
+      <Helmet>
+        <title>{"Team TBD"}</title>
+      </Helmet>
+      <Router history={history}>
+        <Routes />
+      </Router>
     </div>
   );
 };
