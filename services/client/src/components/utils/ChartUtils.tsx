@@ -12,8 +12,7 @@ export class ChartUtils {
     width:number,
     height:number,
     margin_top:number,
-    margin_left:number,
-    xDataFormat:Function) : void {
+    margin_left:number) : void {
 
     svg.append("text")
         .attr("x", width/2)

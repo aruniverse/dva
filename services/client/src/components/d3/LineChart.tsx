@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import ChartUtils from "../utils/Utils"
+import ChartUtils from "../utils/ChartUtils"
 
 const colors = ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e"];
 
@@ -40,7 +40,7 @@ const LineChart = (data:[any,any][]) => {
     var g = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    ChartUtils.initChart(g, title,"Year","Price ($)", xScale, yScale, width, height, margin.top, margin.left, (d:object) => {return 5;});
+    ChartUtils.initChart(g, title,"Year","Price ($)", xScale, yScale, width, height, margin.top, margin.left);
     addChartLine(data,g,xScale,yScale,"#d95f02");
 
     //var legendData=[{color:"#1b9e77",name:"actual"},{color:"#d95f02",name:"predicted"}]; //,{color:"#7570b3",name:"Midwest"},{color:"#e7298a",name:"Northeast"}]
