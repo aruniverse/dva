@@ -42,6 +42,7 @@ class price_analysis:
 
         self.results={'dates': self.df_data['Date'].tolist() ,
                       'strategy':{},
+					  'indicators':{},
                       'predict':{}}
 
     def strategy_returns(self):
@@ -130,8 +131,10 @@ class price_analysis:
             self.df_anal['rel_strength']=ta.momentum.rsi(self.df_data['Close'], period_rsi)
 
         self.results['predict']['indicator_list']=self.indicator_list
+        
+
         self.random_forest_analysis()
-            
+        
     def add_strategy(self):
         self.strategy_list=[]
 
@@ -178,6 +181,9 @@ class price_analysis:
                                                         'importance_values':feat_import.tolist(),
                                                         'importance_order':feat_import.argsort()[::-1][:n].tolist(),
                                                         'predict':clf.predict(x_data).tolist()}
+            for ind in self.indicator_list:
+                self.results['indicators'][ind]=self.df_anal[ind].tolist()
+            
 
     def bollinger_band(self):
 
@@ -249,6 +255,8 @@ class price_analysis:
 
     def get_data_df(self):
         return self.df_data
+
+    
     
    
 
@@ -294,7 +302,6 @@ if __name__ == "__main__":
     if verbose: pa.write_bollinger_band_to_csv()
     if verbose: pa.write_williams_r_to_csv()
     if verbose: pa.write_strategy_results()
-
 
     
     
