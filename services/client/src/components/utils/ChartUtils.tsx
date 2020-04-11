@@ -11,6 +11,8 @@ export class ChartUtils {
     yScale:any,
     width:number,
     height:number,
+    axis_width:number,
+    axis_height:number,
     margin_top:number,
     margin_left:number) : void {
 
@@ -37,11 +39,12 @@ export class ChartUtils {
         .attr("text-anchor","middle")
         .text(ylabel);
     svg.append("g")
-        .attr("transform", "translate(0," + (height) + ")")
+        .attr("transform", "translate(0," + (axis_height) + ")")
         .call(d3.axisBottom(xScale)
         //.tickFormat((d)=> xDataFormat(d)) //.getFullYear())
         .ticks(5));
     svg.append("g")
+        .attr("transform", "translate(" + axis_width + ", 0)")
         .attr("class", "y axis")
         .call(d3.axisLeft(yScale));
   };
