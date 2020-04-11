@@ -6,44 +6,35 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score, GridSearchCV, cross_validate, train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.feature_selection import f_regression
 
 
 class price_analysis:
 
     def __init__(self, dataframe, parameters, verbose):
 
-
-
-
-
         self.verbose=verbose #print output or not
 
-        split_point=int(len(dataframe.index)/2)
-        self.df_norm=dataframe.iloc[:split_point,:]  #use first half of data for price and volume normalization
-        self.df_data=dataframe.iloc[split_point:,:]  #use second half of data for analysis
+        self.df_data=dataframe 
 
         self.parameters=parameters          #assign parameters
 
         self.df_anal=pd.DataFrame(index=self.df_data.index)         #create dataframe for analysis
         self.df_anal['Date']=self.df_data['Date']
 
-        max_vol=self.df_norm['Volume'].max()
-        min_vol=self.df_norm['Volume'].min()
-
-        max_price=self.df_norm['Adj Close'].max()
-        min_price=self.df_norm['Adj Close'].min()
-
         self.calc_max_move()
 
         self.calc_daily_return(self.df_data, 'Close')
 
         self.df_strategy=pd.DataFrame(index=self.df_data.index)     #create dataframe for strategy results
-        self.df_strategy['Issue']=1
 
-        self.results={'dates': self.df_data['Date'].tolist() ,
+        self.results={'dates': self.df_data['Date'].tolist(),
+                      'daily_ret': self.df_data['Daily_return'].tolist(),
+                      'cum_return': self.df_data['Cum_return'].tolist(),
                       'strategy':{},
-					  'indicators':{},
-                      'predict':{}}
+                      'indicators':{},
+                      'predict':{},
+                      'f_regression':{}}
 
     def strategy_returns(self):
         
@@ -54,12 +45,13 @@ class price_analysis:
         self.df_strategy_return.dropna(inplace=True)
         for col_name in list(self.df_strategy):
             self.df_strategy_return[col_name]=self.df_strategy_return[col_name+'_daily'].cumsum()
-            self.results['strategy'][col_name]=self.df_strategy_return[col_name].tolist()
+            self.results['strategy'][col_name]['cum_return']=self.df_strategy_return[col_name].tolist()
 
     def calc_daily_return(self, dataframe, series):
         
         dataframe['Daily_return']=(dataframe[series]-dataframe[series].shift(1))/dataframe[series].shift(1)
         dataframe['Cum_return']=dataframe['Daily_return'].cumsum()
+        dataframe.dropna(inplace=True)
 
     #Allocates max move for prescribed term into defined bucket
     def calc_max_move(self):
@@ -131,22 +123,24 @@ class price_analysis:
             self.df_anal['rel_strength']=ta.momentum.rsi(self.df_data['Close'], period_rsi)
 
         self.results['predict']['indicator_list']=self.indicator_list
-        
-
         self.random_forest_analysis()
+        self.f_test_analysis()
         
     def add_strategy(self):
         self.strategy_list=[]
 
         if self.parameters['strategy']['bollinger']['include']==True:
             self.strategy_list.append('bollinger')
+            self.results['strategy']['bollinger']={}
             self.bollinger_band()
             
         if self.parameters['strategy']['williams_r']['include']==True:
             self.strategy_list.append('williams_r')
+            self.results['strategy']['williams_r']={}
             self.williams_r()
 
         self.results['strategy']['strategy_list']=self.strategy_list
+            
     
     def random_forest_analysis(self):
 
@@ -184,6 +178,18 @@ class price_analysis:
             for ind in self.indicator_list:
                 self.results['indicators'][ind]=self.df_anal[ind].tolist()
             
+    def f_test_analysis(self):
+        self.df_anal.dropna(inplace=True)
+        self.results['f_regression']['indicator_list']=self.indicator_list
+        
+        for term in self.parameters['metric']['term']:
+            x_data=self.df_anal.loc[:,self.indicator_list]
+            y_data=self.df_anal.loc[:,'term_'+str(term)]
+
+            f, pval=f_regression(x_data, y_data, center=True)
+            if self.verbose: print ('f_test results for ', term, ':', pval)
+            self.results['f_regression']['term_'+str(term)]={'p_values': pval.tolist()}
+
 
     def bollinger_band(self):
 
@@ -199,18 +205,28 @@ class price_analysis:
 
         owned_long=0
         owned_short=0
+
+        bollinger_actions=[]
         for i in range(self.df_data.index[0]+period,self.df_data.index[-1]+1):
             if owned_long==0 and self.bb_df.loc[i,'Close']<self.bb_df.loc[i,'bollinger_low']:
                 owned_long=1
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'enter','long'])
             if owned_long==1 and self.bb_df.loc[i,'Close']>self.bb_df.loc[i,'Average']:
                 owned_long=0
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'exit','long'])
             if owned_short==0 and self.bb_df.loc[i,'Close']>self.bb_df.loc[i,'bollinger_hi']:
                 owned_short=1
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'enter','short'])
             if owned_short==1 and self.bb_df.loc[i,'Close']<self.bb_df.loc[i,'Average']:
                 owned_short=0
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'exit','short'])
             self.bb_df.loc[i,'BB_owned_short']=owned_short
             self.bb_df.loc[i,'BB_owned_long']=owned_long
             self.df_strategy.loc[i,'bollinger']=owned_long-owned_short
+
+        if self.verbose: print ("\nBollinger actions:\n",bollinger_actions, "\n")
+        print (self.results)
+        self.results['strategy']['bollinger']['actions']=bollinger_actions
 
 
     def williams_r(self):
@@ -221,18 +237,26 @@ class price_analysis:
 
         owned_long=0
         owned_short=0
+        williams_r_actions=[]
         for i in range(self.df_data.index[0]+period_wr,self.df_data.index[-1]+1):
             if owned_long==0 and self.wr_df.loc[i,'williams_r']<-80:
                 owned_long=1
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'enter','long'])
             if owned_long==1 and self.wr_df.loc[i,'williams_r']>-50:
                 owned_long=0
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'exit','long'])
             if owned_short==0 and self.wr_df.loc[i,'williams_r']>-20:
                 owned_short=1
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'enter','short'])
             if owned_short==1 and self.wr_df.loc[i,'williams_r']<-50:
                 owned_short=0
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'exit','short'])
             self.wr_df.loc[i,'wr_owned_short']=owned_short
             self.wr_df.loc[i,'wr_owned_long']=owned_long
             self.df_strategy.loc[i,'williams_r']=owned_long-owned_short
+
+        if self.verbose: print ("\nWilliams_r actions:\n",williams_r_actions, "\n")
+        self.results['strategy']['williams_r']['actions']=williams_r_actions
         
 
     def write_results_json(self):
