@@ -19,6 +19,14 @@ class price_analysis:
 
         self.parameters=parameters          #assign parameters
 
+        #Index in df_data to start analysis--this accounts for different backward looking periods for the different indicators
+        self.start_index=self.get_max_period()       
+        if verbose: print ('Start index:', self.start_index)
+
+        #Index in df data to stop analysis--this accounts for forward looking returns for binning
+        self.stop_index=self.df_data.index[-1]-self.get_max_term()-1
+        if verbose: print ('Stop index:', self.stop_index)
+
         self.df_anal=pd.DataFrame(index=self.df_data.index)         #create dataframe for analysis
         self.df_anal['Date']=self.df_data['Date']
 
@@ -28,13 +36,29 @@ class price_analysis:
 
         self.df_strategy=pd.DataFrame(index=self.df_data.index)     #create dataframe for strategy results
 
-        self.results={'dates': self.df_data['Date'].tolist(),
-                      'daily_ret': self.df_data['Daily_return'].tolist(),
-                      'cum_return': self.df_data['Cum_return'].tolist(),
+        self.results={'dates': self.df_data.loc[self.start_index:self.stop_index,'Date'].tolist(),
+                      'daily_ret': self.df_data.loc[self.start_index:self.stop_index,'Daily_return'].tolist(),
+                      'cum_return': self.df_data.loc[self.start_index:self.stop_index,'Cum_return'].tolist(),
                       'strategy':{},
                       'indicators':{},
                       'predict':{},
                       'f_regression':{}}
+
+    def get_max_period(self):
+        max_period=0
+        for indicator in self.parameters['indicator'].keys():
+            if 'period' in self.parameters['indicator'][indicator]['parameters']:
+                if self.parameters['indicator'][indicator]['parameters']['period']>max_period:
+                    max_period=self.parameters['indicator'][indicator]['parameters']['period']
+        for strategy in self.parameters['strategy'].keys():
+            if 'period' in self.parameters['strategy'][strategy]['parameters']:
+                if self.parameters['strategy'][strategy]['parameters']['period']>max_period:
+                    max_period=self.parameters['strategy'][strategy]['parameters']['period']
+
+        return max_period+1
+
+    def get_max_term(self):
+        return max(self.parameters['term'])
 
     def strategy_returns(self):
         
@@ -45,7 +69,7 @@ class price_analysis:
         self.df_strategy_return.dropna(inplace=True)
         for col_name in list(self.df_strategy):
             self.df_strategy_return[col_name]=self.df_strategy_return[col_name+'_daily'].cumsum()
-            self.results['strategy'][col_name]['cum_return']=self.df_strategy_return[col_name].tolist()
+            self.results['strategy'][col_name]['cum_return']=self.df_strategy_return.loc[self.start_index:self.stop_index, col_name].tolist()
 
     def calc_daily_return(self, dataframe, series):
         
@@ -58,7 +82,7 @@ class price_analysis:
 
         append_data=False
         
-        for term in self.parameters['metric']['term']:
+        for term in self.parameters['term']:
             term_series=pd.Series(index=self.df_data.index, dtype=float)
             term_hi_series=pd.Series(index=self.df_data.index, dtype=float)
             term_low_series=pd.Series(index=self.df_data.index, dtype=float)
@@ -77,12 +101,12 @@ class price_analysis:
                     max_move=(max_low-open_val)/open_val
                 else:
                     max_move=max_up                    
-                for bucket in self.parameters['metric']['move']:
+                for bucket in self.parameters['move']:
                     if max_move<bucket/100:
-                        term_series[i]=int(self.parameters['metric']['move'].index(bucket))
+                        term_series[i]=int(self.parameters['move'].index(bucket))
                         break
                     else:
-                        term_series[i]=len(self.parameters['metric']['move'])
+                        term_series[i]=len(self.parameters['move'])
                 term_hi_series[i]=max_up
                 term_low_series[i]=(max_low-open_val)/open_val
                 term_open_series[i]=open_val
@@ -98,28 +122,28 @@ class price_analysis:
 
         self.indicator_list=[]
 
-        if self.parameters['metric']['acc_dist_index']['include']==True:
+        if self.parameters['indicator']['acc_dist_index']['include']==True:
             self.indicator_list.append('acc_dist_index')
             self.df_anal['acc_dist_index']=ta.volume.acc_dist_index(self.df_data['High'], self.df_data['Low'], self.df_data['Close'], self.df_data['Volume'])
 
-        if self.parameters['metric']['chaikin_money_flow']['include']==True:
+        if self.parameters['indicator']['chaikin_money_flow']['include']==True:
             self.indicator_list.append('chaikin_money_flow')
-            period_cmf=self.parameters['metric']['chaikin_money_flow']['parameters']['period']
+            period_cmf=self.parameters['indicator']['chaikin_money_flow']['parameters']['period']
             self.df_anal['chaikin_money_flow']=ta.volume.chaikin_money_flow(self.df_data['High'], self.df_data['Low'], self.df_data['Close'], self.df_data['Volume'], period_cmf)
             
-        if self.parameters['metric']['ease_of_move']['include']==True:
+        if self.parameters['indicator']['ease_of_move']['include']==True:
             self.indicator_list.append('ease_of_move')
-            period_eom=self.parameters['metric']['ease_of_move']['parameters']['period']
+            period_eom=self.parameters['indicator']['ease_of_move']['parameters']['period']
             self.df_anal['ease_of_move']=ta.volume.ease_of_movement(self.df_data['High'], self.df_data['Low'], self.df_data['Volume'], period_eom)
 
-        if self.parameters['metric']['williams_r']['include']==True:
+        if self.parameters['indicator']['williams_r']['include']==True:
             self.indicator_list.append('williams_r')
-            period_wr=self.parameters['metric']['williams_r']['parameters']['period']
+            period_wr=self.parameters['indicator']['williams_r']['parameters']['period']
             self.df_anal['williams_r']=ta.momentum.wr(self.df_data['High'], self.df_data['Low'], self.df_data['Close'], period_wr)
 
-        if self.parameters['metric']['rel_strength']['include']==True:
+        if self.parameters['indicator']['rel_strength']['include']==True:
             self.indicator_list.append('rel_strength')
-            period_rsi=self.parameters['metric']['rel_strength']['parameters']['period']
+            period_rsi=self.parameters['indicator']['rel_strength']['parameters']['period']
             self.df_anal['rel_strength']=ta.momentum.rsi(self.df_data['Close'], period_rsi)
 
         self.results['predict']['indicator_list']=self.indicator_list
@@ -144,11 +168,21 @@ class price_analysis:
     
     def random_forest_analysis(self):
 
-        self.df_anal.dropna(inplace=True)
+        #Select rows for analysis for given start and stop index
+        rows_to_drop=[]
+        for i in range(0,self.start_index):
+            rows_to_drop.append(i)
+        for i in range(self.stop_index+1, self.df_anal.index[-1]+1):
+            rows_to_drop.append(i)
+
+        print ("\nRows to drop:\n", rows_to_drop)
+
+        self.df_anal.drop(rows_to_drop, inplace=True)
+        print ("\ndf_anal:\n", self.df_anal)
                 
-        for term in self.parameters['metric']['term']:
-            x_data=self.df_anal.loc[:,self.indicator_list]
-            y_data=self.df_anal.loc[:,'term_'+str(term)]
+        for term in self.parameters['term']:
+            x_data=self.df_anal.loc[:,self.indicator_list] #start at reference index
+            y_data=self.df_anal.loc[:,'term_'+str(term)]  #start at reference index
 
             x_train, x_test, y_train, y_test=train_test_split(x_data, y_data, test_size=0.25)
             clf = RandomForestClassifier(n_estimators=6)
@@ -182,7 +216,7 @@ class price_analysis:
         self.df_anal.dropna(inplace=True)
         self.results['f_regression']['indicator_list']=self.indicator_list
         
-        for term in self.parameters['metric']['term']:
+        for term in self.parameters['term']:
             x_data=self.df_anal.loc[:,self.indicator_list]
             y_data=self.df_anal.loc[:,'term_'+str(term)]
 
@@ -257,8 +291,8 @@ class price_analysis:
 
         if self.verbose: print ("\nWilliams_r actions:\n",williams_r_actions, "\n")
         self.results['strategy']['williams_r']['actions']=williams_r_actions
-        
 
+        
     def write_results_json(self):
         pass
 
@@ -281,9 +315,6 @@ class price_analysis:
         return self.df_data
 
     
-    
-   
-
 ##Main
 
 if __name__ == "__main__":
