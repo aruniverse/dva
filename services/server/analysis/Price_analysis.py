@@ -39,6 +39,8 @@ class price_analysis:
         self.results={'dates': self.df_data.loc[self.start_index:self.stop_index,'Date'].tolist(),
                       'daily_ret': self.df_data.loc[self.start_index:self.stop_index,'Daily_return'].tolist(),
                       'cum_return': self.df_data.loc[self.start_index:self.stop_index,'Cum_return'].tolist(),
+                      'term':self.parameters['term'],
+                      'move':self.parameters['move'],
                       'strategy':{},
                       'indicators':{},
                       'predict':{},
@@ -163,7 +165,7 @@ class price_analysis:
             self.results['strategy']['williams_r']={}
             self.williams_r()
 
-        self.results['strategy']['strategy_list']=self.strategy_list
+        #self.results['strategy']['strategy_list']=self.strategy_list
             
     
     def random_forest_analysis(self):
