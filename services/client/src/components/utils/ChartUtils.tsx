@@ -48,6 +48,12 @@ export class ChartUtils {
         .attr("class", "y axis")
         .call(d3.axisLeft(yScale));
   };
+
+  static undefinedHandler (valToCheck: any, errVal : number) : number {
+    if(valToCheck) 
+      return valToCheck;
+    return errVal;
+  };
 }
 
 export default ChartUtils;

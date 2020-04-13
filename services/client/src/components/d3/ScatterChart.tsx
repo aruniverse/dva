@@ -2,7 +2,10 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import ChartUtils from "../utils/ChartUtils"
 
-const ScatterChart = (data: number[][], label: string) => {
+const ScatterChart = (props : any) => {
+    //data: number[][], label: string
+    const data : number[][] = props.data;
+    const label : string = props.label;
 
     const canvas = useRef<HTMLDivElement>(null);
 
@@ -33,7 +36,7 @@ const ScatterChart = (data: number[][], label: string) => {
 
     }
     //console.log("max x:", maxX);
-    console.log(data);
+    //console.log(data);
 
     const xScale = d3.scaleLinear().range([0,width]).domain([minX,maxX]);
     const yScale = d3.scaleLinear().range([height,0]).domain([minY,maxY]);
@@ -58,7 +61,10 @@ const ScatterChart = (data: number[][], label: string) => {
         var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        ChartUtils.initChart(g, label,"% gain","value", xScale, yScale, width, height, (1 - maxX / (maxX-minX)) *width, height/2, margin.top, margin.left);
+        const possibleY = ChartUtils.undefinedHandler(d3.max([0,1-maxY/(maxY-minY)]),0);
+        const yAxisShift = ChartUtils.undefinedHandler(d3.min([1,possibleY]),1);
+
+        ChartUtils.initChart(g, label,"% gain","value", xScale, yScale, width, height, (1 - maxX / (maxX-minX)) *width, yAxisShift *height, margin.top, margin.left);
         addXYScatter(g,xScale,yScale,"#d95f02",5);
     }
 
