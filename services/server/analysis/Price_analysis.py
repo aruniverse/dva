@@ -39,6 +39,7 @@ class price_analysis:
         self.results={'dates': self.df_data.loc[self.start_index:self.stop_index,'Date'].tolist(),
                       'daily_ret': self.df_data.loc[self.start_index:self.stop_index,'Daily_return'].tolist(),
                       'cum_return': self.df_data.loc[self.start_index:self.stop_index,'Cum_return'].tolist(),
+                      'price': self.df_data.loc[self.start_index:self.stop_index,'Close'].tolist(),
                       'term':self.parameters['term'],
                       'move':self.parameters['move'],
                       'strategy':{},
