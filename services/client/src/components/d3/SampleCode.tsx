@@ -1,8 +1,12 @@
 import ScatterChart from "./ScatterChart";
 import LineChart from "./LineChart";
-import React from "react";
+import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Select from '@material-ui/core/Select';
+import Slider from '@material-ui/core/Slider';
+import DoubleHorizontalBarChart from "./DoubleHorizontalBarChart";
 
 const LoadChart = () => {
 
@@ -300,7 +304,7 @@ const LoadChart = () => {
                     5.0, 5.0, 5.0, 5.0, 5.0, 1.0, 4.0, 4.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 6.0, 5.0, 5.0, 5.0, 
                     5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 5.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 1.0, 5.0, 1.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 
                     2.0, 2.0, 4.0, 2.0, 4.0, 4.0, 4.0, 2.0, 2.0, 2.0, 2.0]
-            }, 
+            } , 
             "term_60": {
                 "train_score": 0.968503937007874, "test_score": 0.7906976744186046, "importance_values": [0.3166176319639606, 0.11887157670482773, 
                 0.0870183790701539, 0.17135945782931813, 0.3061329544317396], "importance_order": [0, 4, 3, 1, 2], 
@@ -320,20 +324,22 @@ const LoadChart = () => {
             "term_60": {"p_values": [1.1596645089648937e-10, 0.0001837533125600204, 0.7495590777871602, 0.00039637361786577097, 2.3057402944347343e-10]}
         }
     }
-
-/*
-    var currentCash = 10000;
-    var cleanData : [Date, number][] = [];
-    for(var i=0; i< data['dates'].length; i++) {
-        currentCash *= (1+ data['strategy']['Issue'][i]);
-        cleanData.push([new Date(data['dates'][i]), currentCash]);
-    }
-
-    return LineChart(cleanData);
-*/
-
-    //const indicator = "rel_strength";
     var final : JSX.Element[] = [];
+    const [predictionTerm, updateTerm] = useState(5);
+
+    /******************* double bar chart *****************************/
+    var term :any = "term_5";
+    var doubleData = [];
+    var key = "fasdklj";
+    for(var i=0; i<data.f_regression.indicator_list.length; i++) {
+        doubleData.push([i,data.predict.term_5.importance_values[i], data.f_regression.term_5.p_values[i]]);
+    };
+
+    final.push(<Grid item lg={4} key={key}><Card variant="outlined"><DoubleHorizontalBarChart labels={data.f_regression['indicator_list']} data={doubleData}></DoubleHorizontalBarChart></Card></Grid>)
+    
+
+    /* ************ line chart ***************************/
+    //const indicator = "rel_strength";
     var keyPlot = 1098;
     const startPrice = 10000;
     var j=0;
@@ -345,32 +351,85 @@ const LoadChart = () => {
         returnData[i] = [];
     }
 
+    var j =0;
+    var trades : number[][] = [];
+    var k=0;
+
+    const getType = (vals : string[]) : number => {
+        var val = 0;
+        if(vals[1] == "enter") {
+            val+=1;
+        }
+        if(vals[2] == "short") {
+            val+=2;
+        }
+        return val;
+    }
+
     Object.entries(data['strategy']).forEach(
         ([key,value]) => {
             for(var i=0; i<value['cum_return'].length; i++) {
                 //returnData[i] = [];
                 returnData[i][j] = startPrice*(1+value['cum_return'][i]);
             }
+            trades[j] = (data.dates.map(d => (d === value['actions'][k][0]) ? (getType(value['actions'][k++])) :  -1));
             j++;
         }
     );
 
-    final.push(<LineChart data={returnData} dates={dates} title="Return" key = {keyPlot}></LineChart>)
+    final.push(
+        <Grid item lg={6}>
+            <Card variant="outlined">
+                <LineChart data={returnData} dates={dates} trades={trades} title="Return" key = {keyPlot}></LineChart>
+            </Card>
+        </Grid>
+    );
 
+    /*** Scatter Plots ****************** */
     keyPlot++;
+    
+    const handleChange = (event: any, value: number | number[])  => {
+        if(typeof(value)=="number") {
+            updateTerm(value);
+        }
+        
+    };
 
+    final.push(
+        <Grid item lg={5}></Grid>
+    );
+
+    final.push(
+        <Grid item lg={2}>
+            <Slider
+                step={1}
+                marks
+                min={1}
+                max={60}
+                onChange={handleChange}
+                valueLabelDisplay="auto"
+            />
+        </Grid>
+    );
+
+    final.push(
+        <Grid item lg={5}></Grid>
+    );
+    
     Object.entries(data['indicators']).forEach(
         ([key,value]) => {
             var scatterData : number[][] = [];
-            for(var i=0; i<data['dates'].length; i++) {
+            for(var i=0; i<data['dates'].length-predictionTerm; i++) {
                 scatterData[i] = [];
                 scatterData[i].push(data['daily_ret'][i]);
-                scatterData[i].push(value[i+1]);
-            } 
-            final.push(<Grid item lg={4} key={key}><Card><ScatterChart data={scatterData} label={key}></ScatterChart></Card></Grid>);
+                scatterData[i].push(value[i+predictionTerm]);
+            }
+            final.push(<Grid item lg={4} key={key}><Card variant="outlined"><ScatterChart data={scatterData} label={key}></ScatterChart></Card></Grid>);
             keyPlot++;
         }
     );
+
+    console.log("runs");
 
     return (
         <div><Grid container spacing={1}>{final}</Grid></div>

@@ -7,7 +7,7 @@ import Home from "./components/home/Home";
 import D3 from "./components/d3/D3";
 //import Line from "./components/d3/Line";
 //import ScatterChart from "./components/d3/ScatterChart";
-import LoadChart from "./components/d3/Runner";
+import LoadChart from "./components/d3/SampleCode";
 
 
 const Routes = (): JSX.Element => {

@@ -7,14 +7,14 @@ const ScatterChart = (props : any) => {
     const data : number[][] = props.data;
     const label : string = props.label;
 
-    const canvas = useRef<HTMLDivElement>(null);
+    const canvas = useRef(null);
 
     //const label = "Williams R";
     //const data = [[1,12],[2,10]];
   
     const margin = {top: 50, right: 100, bottom: 50, left: 100};
     const width =  500;
-    const height = 500;
+    const height = 500; 
 
     var maxX = data[0][0];
     var minX = data[0][0];
@@ -41,7 +41,8 @@ const ScatterChart = (props : any) => {
     const xScale = d3.scaleLinear().range([0,width]).domain([minX,maxX]);
     const yScale = d3.scaleLinear().range([height,0]).domain([minY,maxY]);
 
-    function addXYScatter(svg : d3.Selection<SVGGElement,unknown,null,undefined>, xScale : any, yScale : any, color : string, radius : number) {
+    //function addXYScatter(svg : d3.Selection<SVGGElement,unknown,null,undefined>, xScale : any, yScale : any, color : string, radius : number) {
+    function addXYScatter(svg : d3.Selection<null, unknown, null, undefined>, xScale : any, yScale : any, color : string, radius : number) {
         svg.selectAll("circle")
         .data(data)
         .enter().append("circle")
@@ -52,14 +53,11 @@ const ScatterChart = (props : any) => {
     }
 
     const drawScatterChart = (title : string,xScale : any, yScale: any) => {
-        
-        var svg = d3.select(canvas.current)
-                    .append("svg")
-                    .attr("height",height + margin.top + margin.bottom)
-                    .attr("width",width + margin.left + margin.right);
+             
+        const g = d3.select(canvas.current);
+        g.selectAll("*").remove();
 
-        var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        console.log("here");
 
         const possibleY = ChartUtils.undefinedHandler(d3.max([0,1-maxY/(maxY-minY)]),0);
         const yAxisShift = ChartUtils.undefinedHandler(d3.min([1,possibleY]),1);
@@ -72,8 +70,16 @@ const ScatterChart = (props : any) => {
         drawScatterChart(label, xScale, yScale);
     });
 
+
+    //https://medium.com/stationfive/how-to-create-a-pie-chart-with-d3-js-and-react-hooks-part-1-81bcd7f39b32
     return (
-        <div ref={canvas}></div>
+        //<div ref={canvas}></div>
+        <svg width={width+margin.left+margin.right} height={height+margin.top+margin.bottom}>
+            <g
+                ref={canvas}
+                transform={`translate(${margin.left},${margin.top})`}
+            />
+        </svg>
       );
     
 }

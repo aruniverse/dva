@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 export class ChartUtils {
  static initChart(
-    svg: d3.Selection<SVGGElement,unknown,null,undefined>,
+    svg: d3.Selection<null, unknown, null, undefined>,//d3.Selection<SVGGElement,unknown,null,undefined>,
     title:string,
     xlabel:string,
     ylabel:string,
@@ -18,14 +18,14 @@ export class ChartUtils {
 
     svg.append("text")
         .attr("x", width/2)
-        .attr("y", margin_top/2) 
+        .attr("y", -margin_top/3)
         .attr("font-size", "24px")
         .attr("text-anchor","middle")
         .text(title);
     
     svg.append("text")
         .attr("x", width/2)
-        .attr("y", height + 2*margin_top/3) 
+        .attr("y", height + 2*margin_top/3)
         .attr("font-size", "16px")
         .attr("text-anchor","middle")
         .text(xlabel);
