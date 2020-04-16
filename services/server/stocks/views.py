@@ -21,7 +21,7 @@ def symbol_list(request):
 	if request.method == 'GET':
 		symbols = NASDAQDay.objects.filter(
 			# symbol='AAPL',
-			symbol__in= ['AAPL', 'FB'],
+			symbol__in= ['AAPL'],
 			datetime__gte = datetime.date(2020, 4, 1),
 			datetime__lt = datetime.date(2020, 4, 13)
 			).order_by('symbol', 'datetime_epoch'
