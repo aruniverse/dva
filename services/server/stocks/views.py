@@ -22,8 +22,8 @@ def symbol_list(request):
 		symbols = NASDAQDay.objects.filter(
 			# symbol='AAPL',
 			symbol__in= ['AAPL'],
-			datetime__gte = datetime.date(2020, 4, 1),
-			datetime__lt = datetime.date(2020, 4, 13)
+			datetime__gte = datetime.date(2019, 10, 1),
+			datetime__lt = datetime.date(2020, 4, 1)
 			).order_by('symbol', 'datetime_epoch'
 			).distinct('symbol', 'open', 'high', 'close', 'volume', 'datetime_epoch', 'datetime'
 			)
