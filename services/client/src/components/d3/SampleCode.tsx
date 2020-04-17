@@ -6,7 +6,24 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Select from '@material-ui/core/Select';
 import Slider from '@material-ui/core/Slider';
+import Typography from '@material-ui/core/Typography';
 import DoubleHorizontalBarChart from "./DoubleHorizontalBarChart";
+import SliderCard from "../ui/SliderCard";
+//import CurrentPosition from "../../utils/CurrentPosition";
+
+export enum CurrentPosition {
+    Short = 1,
+    Neutral = 2,
+    Long = 3
+};
+
+export enum LastPositionChange {
+    NoChange = -1,
+    ExitLong = 0,
+    EnterLong = 1,
+    ExitShort = 2,
+    EnterShort = 3
+};
 
 const LoadChart = () => {
 
@@ -78,6 +95,8 @@ const LoadChart = () => {
             0.06290242202888505, 0.06709843958237215, 0.06820984291915397, 0.06820728550657454, 0.07483599619609244, 0.07506867899121672, 0.07543896586835207, 
             0.07543896586835207, 0.07876488329767914, 0.078706255164692, 0.08673051560049998, 0.08784925126756371, 0.08420392506280887, 0.08016119537692451, 
             0.07819143860912155, 0.0821289500195857, 0.08897549068444006, 0.09094257057097513, 0.09244747036595614, 0.08844981946409572, 0.07888270328457883], 
+        "term": [5, 20, 60], 
+        "move": [-5, -3, -1, 1, 3, 5],
         "strategy": {
             "bollinger": {
                 "actions": [["4/4/2019", "enter", "short"], ["5/2/2019", "exit", "short"], ["5/7/2019", "enter", "long"], 
@@ -326,9 +345,53 @@ const LoadChart = () => {
     }
     var final : JSX.Element[] = [];
     const [predictionTerm, updateTerm] = useState(5);
+    const [longEnter, setLongEnter] = useState(4);
+    const [longExit, setLongExit] = useState(3);
+    const [shortEnter, setShortEnter] = useState(1);
+    const [shortExit, setShortExit] = useState(2);
+
+
+    const handleEnterLong = (event: any, value: number | number[]) => {
+        if(typeof(value)=="number") {
+            setLongEnter(value);
+        }
+    }
+    
+    const handleExitLong = (event: any, value: number | number[])  => {
+        if(typeof(value)=="number") {
+            setLongExit(value);
+        }
+    };
+
+    
+    const handleEnterShort = (event: any, value: number | number[]) => {
+        if(typeof(value)=="number") {
+            setShortEnter(value);
+        }
+    }
+    
+    const handleExitShort = (event: any, value: number | number[])  => {
+        if(typeof(value)=="number") {
+            setShortExit(value);
+        }
+    };
+
+    const addGridOfX = (val:number) => {
+        final.push(
+            <Grid item lg={2}></Grid>
+        );
+    }
+
+    addGridOfX(2);
+    final.push(SliderCard(handleEnterLong, "Enter Long", "Select cutoff percentage where strategy enters long position", 0,5,4, data.move));
+    final.push(SliderCard(handleExitLong, "Exit Long", "Select cutoff percentage where strategy exits long position", 0,5,3, data.move));
+    final.push(SliderCard(handleEnterShort, "Enter Short", "Select cutoff percentage where strategy enters short position", 0,5,2, data.move));
+    final.push(SliderCard(handleExitShort, "Exit Short", "Select cutoff percentage where strategy exit short position", 0,5,3, data.move));
+    addGridOfX(2);
+    addGridOfX(5);
 
     /******************* double bar chart *****************************/
-    var term :any = "term_5";
+    var term :any = 'term_5';
     var doubleData = [];
     var key = "fasdklj";
     for(var i=0; i<data.f_regression.indicator_list.length; i++) {
@@ -336,15 +399,14 @@ const LoadChart = () => {
     };
 
     final.push(<Grid item lg={4} key={key}><Card variant="outlined"><DoubleHorizontalBarChart labels={data.f_regression['indicator_list']} data={doubleData}></DoubleHorizontalBarChart></Card></Grid>)
-    
 
     /* ************ line chart ***************************/
-    //const indicator = "rel_strength";
     var keyPlot = 1098;
     const startPrice = 10000;
     var j=0;
     var dates : Date[] = [];
     var returnData : number[][] = [];
+    var strategyLabels = [];
 
     for(var i=0; i<data['dates'].length; i++) {
         dates.push(new Date(data['dates'][i]));
@@ -369,18 +431,70 @@ const LoadChart = () => {
     Object.entries(data['strategy']).forEach(
         ([key,value]) => {
             for(var i=0; i<value['cum_return'].length; i++) {
-                //returnData[i] = [];
                 returnData[i][j] = startPrice*(1+value['cum_return'][i]);
             }
             trades[j] = (data.dates.map(d => (d === value['actions'][k][0]) ? (getType(value['actions'][k++])) :  -1));
+            strategyLabels.push(key);
             j++;
         }
     );
 
+
+    var currentTrade = CurrentPosition.Neutral;
+    var changedPostion = LastPositionChange.NoChange;
+    var currentPortfolioValue = 10000;
+    var tempChanges : number[] = [];
+    
+    for (i=0; i<data['predict']['term_60']['predict'].length; i++) {
+        var predictedMove=data['predict']['term_60']['predict'][i];
+        changedPostion = LastPositionChange.NoChange;
+
+        //check long position
+        if(currentTrade == CurrentPosition.Long) {
+            if(predictedMove<=longExit) {
+                if(predictedMove<shortEnter) {
+                    currentTrade = CurrentPosition.Short;
+                    changedPostion = LastPositionChange.EnterShort;
+                } else {
+                    currentTrade = CurrentPosition.Neutral;
+                    changedPostion = LastPositionChange.ExitLong;
+                }
+            }
+        } else if(currentTrade == CurrentPosition.Neutral) {
+            if(predictedMove >= longEnter) {
+                currentTrade = CurrentPosition.Long;
+                changedPostion = LastPositionChange.EnterLong;
+            } else if(predictedMove <= shortEnter) {
+                currentTrade = CurrentPosition.Short;
+                changedPostion = LastPositionChange.EnterShort;
+            }
+        } else { // currently shortign
+            if(predictedMove>shortExit) {
+                if(predictedMove>longEnter) {
+                    currentTrade = CurrentPosition.Long;
+                    changedPostion = LastPositionChange.EnterLong;
+                } else {
+                    currentTrade = CurrentPosition.Neutral;
+                    changedPostion = LastPositionChange.ExitShort;
+                }
+            }
+        }
+
+        if(currentTrade== CurrentPosition.Long) {
+            currentPortfolioValue *= (1+data['daily_ret'][i])
+        } else if(currentTrade == CurrentPosition.Short) {
+            currentPortfolioValue *= (1-data['daily_ret'][i])
+        }
+        returnData[i][j] = currentPortfolioValue;
+        tempChanges.push(changedPostion);
+    }
+    trades.push(tempChanges);
+    strategyLabels.push("Random Forest");
+
     final.push(
-        <Grid item lg={6}>
+        <Grid item lg={4} key = {keyPlot}>
             <Card variant="outlined">
-                <LineChart data={returnData} dates={dates} trades={trades} title="Return" key = {keyPlot}></LineChart>
+                <LineChart data={returnData} dates={dates} trades={trades} labels={strategyLabels} title="Return"></LineChart>
             </Card>
         </Grid>
     );
@@ -392,37 +506,22 @@ const LoadChart = () => {
         if(typeof(value)=="number") {
             updateTerm(value);
         }
-        
     };
 
-    final.push(
-        <Grid item lg={5}></Grid>
-    );
-
-    final.push(
-        <Grid item lg={2}>
-            <Slider
-                step={1}
-                marks
-                min={1}
-                max={60}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-            />
-        </Grid>
-    );
-
-    final.push(
-        <Grid item lg={5}></Grid>
-    );
+    addGridOfX(5);
+    addGridOfX(5);
+    addGridOfX(5);
+    final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,60,1, data.move));
+    addGridOfX(5);
+    addGridOfX(5);
     
     Object.entries(data['indicators']).forEach(
         ([key,value]) => {
             var scatterData : number[][] = [];
             for(var i=0; i<data['dates'].length-predictionTerm; i++) {
                 scatterData[i] = [];
-                scatterData[i].push(data['daily_ret'][i]);
-                scatterData[i].push(value[i+predictionTerm]);
+                scatterData[i].push(data['cum_return'][i+predictionTerm] - data['cum_return'][i]);
+                scatterData[i].push(value[i]);
             }
             final.push(<Grid item lg={4} key={key}><Card variant="outlined"><ScatterChart data={scatterData} label={key}></ScatterChart></Card></Grid>);
             keyPlot++;

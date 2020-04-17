@@ -9,6 +9,7 @@ const LineChart = (props: any) => {
   const dates = props.dates;
   const trades = props.trades;
   const title = props.title;
+  const labels : string[] = props.labels;
   const canvas = useRef(null);
   //const data: [number,number][] = [[0,8], [1,5], [2,13], [3,9], [4,12]];
   //const canvas = useRef<HTMLDivElement>(null);
@@ -102,6 +103,16 @@ const LineChart = (props: any) => {
     addChartSymbol(g, enterShort, "enterLong", false, "red");
     addChartSymbol(g, exitShort, "enterLong", true, "red");
 
+    var legendData = []; 
+    for(var i=0; i<labels.length; i++) {
+      legendData.push({color:colors[i%colors.length], name:labels[i], isLine:true});
+    }
+    legendData.push({color:"red", name:"Enter Short", hollow:false});
+    legendData.push({color:"red", name:"Exit Short", hollow:true});
+    legendData.push({color:"green", name:"Enter Short"});
+    legendData.push({color:"green", name:"Exit Long", hollow:true});
+
+    ChartUtils.createLegend(g, legendData, width, height);
 
 
     //var legendData=[{color:"#1b9e77",name:"actual"},{color:"#d95f02",name:"predicted"}]; //,{color:"#7570b3",name:"Midwest"},{color:"#e7298a",name:"Northeast"}]
