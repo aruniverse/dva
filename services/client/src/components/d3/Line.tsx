@@ -1,5 +1,5 @@
 import React from "react";
-import withMainContainer from "../main/MainStyle";
+import withMainContainer from "../main/MainContainer";
 import * as d3 from "d3";
 
 const Line = () => {

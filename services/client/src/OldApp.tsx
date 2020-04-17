@@ -4,7 +4,7 @@ import "./App.css";
 // import { Button } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { Helmet } from "react-helmet";
-import withMainContainer from "./components/main/MainStyle";
+import withMainContainer from "./components/main/MainContainer";
 
 const OldApp: React.FC = () => {
   return (

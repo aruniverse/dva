@@ -1,5 +1,5 @@
 import * as React from "react";
-import withMainContainer from "../main/MainStyle";
+import withMainContainer from "../main/MainContainer";
 
 const Page404 = () => {
   return (
