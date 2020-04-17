@@ -7,30 +7,24 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score, GridSearchCV, cross_validate, train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_selection import f_regression
-import random
 
 
 class price_analysis:
 
-    def __init__(self, data_file, start_date_str, end_date_str, output_json_name, verbose):
+    def __init__(self, dataframe, parameters, verbose):
 
         self.verbose=verbose #print output or not
-        self.output_json_name=output_json_name  #name for output json object
 
-        self.create_df(data_file) #create dataframe from datafile
+        self.df_data=dataframe 
 
-        with open('parameters.json', "r") as read_file: #assign parameters from parameters.json file
-            self.parameters=json.load(read_file)
-        
+        self.parameters=parameters          #assign parameters
 
         #Index in df_data to start analysis--this accounts for different backward looking periods for the different indicators
-        start_date=self.check_date(pd.to_datetime(start_date_str))
-        self.start_index=self.df_data.loc[self.df_data['Date']==start_date].index[0]       
+        self.start_index=self.get_max_period()       
         if verbose: print ('Start index:', self.start_index)
 
         #Index in df data to stop analysis--this accounts for forward looking returns for binning
-        stop_date=self.check_date(pd.to_datetime(end_date_str))
-        self.stop_index=self.df_data.loc[self.df_data['Date']==stop_date].index[0]  
+        self.stop_index=self.df_data.index[-1]-self.get_max_term()-1
         if verbose: print ('Stop index:', self.stop_index)
 
         self.df_anal=pd.DataFrame(index=self.df_data.index)         #create dataframe for analysis
@@ -42,8 +36,7 @@ class price_analysis:
 
         self.df_strategy=pd.DataFrame(index=self.df_data.index)     #create dataframe for strategy results
 
-        
-        self.results={'dates': self.df_data.loc[self.start_index:self.stop_index,'Date_str'].tolist(),
+        self.results={'dates': self.df_data.loc[self.start_index:self.stop_index,'Date'].tolist(),
                       'daily_ret': self.df_data.loc[self.start_index:self.stop_index,'Daily_return'].tolist(),
                       'cum_return': self.df_data.loc[self.start_index:self.stop_index,'Cum_return'].tolist(),
                       'price': self.df_data.loc[self.start_index:self.stop_index,'Close'].tolist(),
@@ -53,33 +46,6 @@ class price_analysis:
                       'indicators':{},
                       'predict':{},
                       'f_regression':{}}
-
-
-    def create_df(self, data_file):
-
-        if data_file.endswith('.csv'):
-            self.df_data=pd.read_csv(args.data_file)
-            self.df_data['Date']=pd.to_datetime(self.df_data['Date'])   #Convert date to datetime
-
-        elif data_file.endswith('.json'):
-            self.df_data=pd.read_json('data.json')
-            self.df_data.rename(inplace=True, columns={'open':'Open','high':'High','close':'Close','volume':'Volume','datetime':'Date'})
-            self.df_data['Low']=self.df_data['Close']-random.random()*10  #Temporary placeholder for low
-
-        else:
-            print ('Invalid file extension on input file')
-
-        self.df_data['Date_str']=self.df_data['Date'].dt.strftime('%m/%d/%Y') #Add column wiht text as dates for output
-
-
-    def check_date(self, date):
-        while True:
-            if len(self.df_data.loc[self.df_data['Date']==date].index) != 0:
-                break
-            else:
-                date=date+pd.Timedelta(1, unit='D')
-
-        return date
 
     def get_max_period(self):
         max_period=0
@@ -128,6 +94,7 @@ class price_analysis:
             if self.verbose: print ('term:', term)
             if self.verbose: print('start index:', self.df_data.index[0])
             if self.verbose: print('stop_index:', self.df_data.index[-1])
+            if self.verbose: print('Open of row 1:', self.df_data.loc[130,'Open'])
             for i in range(self.df_data.index[0],self.df_data.index[-1]-term):
                 open_val=self.df_data.loc[i,'Open']
                 max_high=self.df_data.loc[i:i+term,'High'].max()
@@ -256,15 +223,9 @@ class price_analysis:
             x_data=self.df_anal.loc[:,self.indicator_list]
             y_data=self.df_anal.loc[:,'term_'+str(term)]
 
-            #pval reutrning nan if all predicted values are the same--omit in output if that is the case
             f, pval=f_regression(x_data, y_data, center=True)
-            for val in pval:
-                if np.isnan(val):
-                    self.results['f_regression']['term_'+str(term)]={'p_values': []}
-                else:
-                    self.results['f_regression']['term_'+str(term)]={'p_values': pval.tolist()}
             if self.verbose: print ('f_test results for ', term, ':', pval)
-            
+            self.results['f_regression']['term_'+str(term)]={'p_values': pval.tolist()}
 
 
     def bollinger_band(self):
@@ -286,16 +247,16 @@ class price_analysis:
         for i in range(self.df_data.index[0]+period,self.df_data.index[-1]+1):
             if owned_long==0 and self.bb_df.loc[i,'Close']<self.bb_df.loc[i,'bollinger_low']:
                 owned_long=1
-                bollinger_actions.append([self.df_data.loc[i,'Date_str'],'enter','long'])
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'enter','long'])
             if owned_long==1 and self.bb_df.loc[i,'Close']>self.bb_df.loc[i,'Average']:
                 owned_long=0
-                bollinger_actions.append([self.df_data.loc[i,'Date_str'],'exit','long'])
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'exit','long'])
             if owned_short==0 and self.bb_df.loc[i,'Close']>self.bb_df.loc[i,'bollinger_hi']:
                 owned_short=1
-                bollinger_actions.append([self.df_data.loc[i,'Date_str'],'enter','short'])
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'enter','short'])
             if owned_short==1 and self.bb_df.loc[i,'Close']<self.bb_df.loc[i,'Average']:
                 owned_short=0
-                bollinger_actions.append([self.df_data.loc[i,'Date_str'],'exit','short'])
+                bollinger_actions.append([self.df_data.loc[i,'Date'],'exit','short'])
             self.bb_df.loc[i,'BB_owned_short']=owned_short
             self.bb_df.loc[i,'BB_owned_long']=owned_long
             self.df_strategy.loc[i,'bollinger']=owned_long-owned_short
@@ -317,16 +278,16 @@ class price_analysis:
         for i in range(self.df_data.index[0]+period_wr,self.df_data.index[-1]+1):
             if owned_long==0 and self.wr_df.loc[i,'williams_r']<-80:
                 owned_long=1
-                williams_r_actions.append([self.df_data.loc[i,'Date_str'],'enter','long'])
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'enter','long'])
             if owned_long==1 and self.wr_df.loc[i,'williams_r']>-50:
                 owned_long=0
-                williams_r_actions.append([self.df_data.loc[i,'Date_str'],'exit','long'])
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'exit','long'])
             if owned_short==0 and self.wr_df.loc[i,'williams_r']>-20:
                 owned_short=1
-                williams_r_actions.append([self.df_data.loc[i,'Date_str'],'enter','short'])
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'enter','short'])
             if owned_short==1 and self.wr_df.loc[i,'williams_r']<-50:
                 owned_short=0
-                williams_r_actions.append([self.df_data.loc[i,'Date_str'],'exit','short'])
+                williams_r_actions.append([self.df_data.loc[i,'Date'],'exit','short'])
             self.wr_df.loc[i,'wr_owned_short']=owned_short
             self.wr_df.loc[i,'wr_owned_long']=owned_long
             self.df_strategy.loc[i,'williams_r']=owned_long-owned_short
@@ -356,10 +317,6 @@ class price_analysis:
     def get_data_df(self):
         return self.df_data
 
-    def write_results_json(self):
-        with open(self.output_json_name, "w") as write_file:         
-            json.dump(pa.results, write_file)
-
     
 ##Main
 
@@ -367,27 +324,30 @@ if __name__ == "__main__":
 
     verbose=True
 
-    parser=argparse.ArgumentParser(description='sample command python price_analysis.py <input data file name> <start date> <end date> <output json file>')
+    parser=argparse.ArgumentParser(description='sample command python price_analysis.py <input csv data file> <input json param file> <output json file>')
     parser.add_argument("data_file", help="name of data input file")
-    parser.add_argument("start_date", help="start date for analysis")
-    parser.add_argument("end_date", help="end date for analysis")
+    parser.add_argument("param_file", help="name of parameter file")
     parser.add_argument("output_file", help="name of output file")
     args=parser.parse_args()
     
-    
+    with open(args.param_file, "r") as read_file:
+        parameters=json.load(read_file)
+
+
     #Price analysis
-    pa=price_analysis(args.data_file, args.start_date, args.end_date, args.output_file, verbose)
+    pa=price_analysis(pd.read_csv(args.data_file), parameters, verbose)
     pa.add_indicators()
 
     #Strategy comparison"
     pa.add_strategy()
     pa.strategy_returns()
-    pa.write_results_json()
 
-    
+    with open(args.output_file, "w") as write_file:
+        json.dump(pa.results, write_file)
     
 
     #Print values
+    if verbose: print ('Input parameters:', parameters)
     if verbose: print ('Input data:\n', pd.read_csv(args.data_file))
     if verbose: print ('Analyze dataframe:\n', pa.df_anal)
     if verbose: print ('Bollinger bands dataframe:\n', pa.bb_df)

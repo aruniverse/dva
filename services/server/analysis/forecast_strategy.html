@@ -76,7 +76,7 @@ var svg = d3.select("body").append("svg")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("output_13Apr.json").then(function(data){
+d3.json("output_17Apr.json").then(function(data){
 	console.log(data);
 	console.log('Number of buckets:', data.move.length);
 	num_buckets=data['move'].length;
@@ -85,9 +85,9 @@ d3.json("output_13Apr.json").then(function(data){
 	if (num_buckets>2){
 		mid_bucket=num_buckets/2;
 		enter_long=mid_bucket;
-		exit_long=mid_bucket;
+		exit_long=0.02;
 		enter_short=mid_bucket;
-		exit_short=mid_bucket;
+		exit_short=-0.02;
 	}
 	
 	d=data
@@ -99,7 +99,7 @@ d3.json("output_13Apr.json").then(function(data){
 	term=data['term'][0];
 	init_plot();
 	set_sliders();
-	calc_return();
+	calc_strat_return();
 	
 });
 
@@ -126,7 +126,7 @@ function init_plot(){
 }
 
 
-function calc_return(){
+function calc_strat_return(){
 	
 	var daily_pos= new Array()
 	var moves=d.move;  //list of buckets
@@ -258,7 +258,7 @@ var termSlider = d3
     .default(terms[0])
     .on('onchange', val => {
 	  term=d.term[val];
-	  calc_return();
+	  calc_strat_return();
     });
 
   var termEnter = d3
@@ -283,7 +283,7 @@ var termSlider = d3
     .default(enter_long)
     .on('onchange', val => {
 	  enter_long=val;
-	  calc_return();
+	  calc_strat_return();
     });
 
   var longEnter = d3
@@ -308,7 +308,7 @@ var termSlider = d3
     .default(exit_long)
     .on('onchange', val => {
 	  exit_long=val;
-	  calc_return();
+	  calc_strat_return();
     });
 
   var longExit = d3
@@ -333,7 +333,7 @@ var termSlider = d3
     .default(enter_short)
     .on('onchange', val => {
 	  enter_short=val;
-	  calc_return();
+	  calc_strat_return();
     });
 
   var shortEnter = d3
@@ -358,7 +358,7 @@ var termSlider = d3
     .default(exit_short)
     .on('onchange', val => {
 	  exit_short=val;
-	  calc_return();
+	  calc_strat_return();
     });
 
   var shortExit = d3
