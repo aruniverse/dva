@@ -41,7 +41,6 @@ const DoubleHorizontalBarChart = (props: any) => { //= (data:[any,any][]) => {
     const g = d3.select(canvas.current);
     g.selectAll("*").remove();
 
-
     for(var i=0; i< labels.length; i++) {
       g.append("text")
         .attr("x", -10)
