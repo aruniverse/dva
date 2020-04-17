@@ -16352,5 +16352,58 @@
       "volume": 250,
       "datetime": 1585180260000
     }
-  ]
+  ],
+  "symbol": "T",
+  "empty": false
+}
+
+Resource Summary
+
+Security
+
+
+OAuth 2.0
+
+Content Type
+
+
+application/json
+
+Category
+
+
+Price History
+Response Summary
+
+    JSON
+    Schema
+
+//CandleList:
+
+{
+
+  "candles": [
+
+    {
+
+      "close": 0,
+
+      "datetime": 0,
+
+      "high": 0,
+
+      "low": 0,
+
+      "open": 0,
+
+      "volume": 0
+
+    }
+
+  ],
+
+  "empty": false,
+
+  "symbol": "string"
+
 }
