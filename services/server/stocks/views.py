@@ -32,6 +32,7 @@ def symbol_list(request):
 			'symbol'		 : [row.symbol for row in symbols],
 			'open'  		 : [row.open for row in symbols],
 			'high'  		 : [row.high for row in symbols],
+			'low'  		 : [row.low for row in symbols],
 			'close' 		 : [row.close for row in symbols],
 			'volume' 		 : [row.volume for row in symbols],
 			'datetime_epoch' : [row.datetime_epoch for row in symbols],
