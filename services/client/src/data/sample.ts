@@ -517,6 +517,10 @@ export const sample_data: StockAnalysis = {
     0.08844981946409572,
     0.07888270328457883,
   ],
+  "price": [257.5, 257.13, 257.24, 259.43, 260.14, 262.2, 261.96, 264.47, 262.64, 265.76, 267.1, 266.29, 263.19,
+    262.01, 261.78, 266.37, 264.29, 267.84, 267.25, 264.16, 259.45, 261.74, 265.58, 270.71, 266.92, 268.48, 
+    270.77, 271.46, 275.15, 279.86, 280.41, 279.74, 280.02, 279.44, 284.0, 284.27, 289.91, 289.8, 291.52, 
+   293.65, 300.35], 
   term: [5, 20, 60],
   move: [-5, -3, -1, 1, 3, 5],
   strategy: {
@@ -1778,13 +1782,13 @@ export const sample_data: StockAnalysis = {
     ],
   },
   predict: {
-    indicator_list: [
+  /*  indicator_list: [
       "acc_dist_index",
       "chaikin_money_flow",
       "ease_of_move",
       "williams_r",
       "rel_strength",
-    ],
+    ],*/
     term_5: {
       train_score: 0.9606299212598425,
       test_score: 0.46511627906976744,
@@ -2339,13 +2343,14 @@ export const sample_data: StockAnalysis = {
     },
   },
   f_regression: {
-    indicator_list: [
+  /*  indicator_list: [
       "acc_dist_index",
       "chaikin_money_flow",
       "ease_of_move",
       "williams_r",
       "rel_strength",
     ],
+  */
     term_5: {
       p_values: [
         0.48428953717792134,

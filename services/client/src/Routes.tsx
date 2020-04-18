@@ -9,6 +9,7 @@ import D3 from "./components/d3/D3";
 //import ScatterChart from "./components/d3/ScatterChart";
 import LoadChart from "./components/d3/SampleCode";
 import Test from "./components/axioscomp/Test";
+import TestData from "./components/ui/TestData";
 
 const Routes = (): JSX.Element => {
   return (
@@ -16,7 +17,7 @@ const Routes = (): JSX.Element => {
       <Route exact path="/" component={Home} />
       <Route exact path="/old" component={OldApp} />
       <Route exact path="/alpha" component={Test} />
-      <Route exact path="/bravo" component={LoadChart} />
+      <Route exact path="/bravo" component={TestData} />
       {/* <Route exact path="/charlie" component={Line} /> */}
       <Route exact path="/d3" component={D3} />
       <Route component={Page404} />

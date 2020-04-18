@@ -14,18 +14,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import { StockAnalysis } from "../../types";
 
 interface StringBoolean {
     [id:string]:boolean
 }
 
-const Indicators = (props: any) => {
-
-    const dates : string[] = props.data.dates;
-    const f_regression : {[id:string]: {[id:string]:number[]}} = props.data.f_regression;
-    const predict : {[id:string]: {[id:string]:number[]}} = props.data.predict;
-    const indicators : {[id:string]: {[id:string]:number[]}} = props.data.indicators;
-    const cumReturn : number[] = props.data.cum_return;
+const IndicatorsLayout = (props: StockAnalysis) => {
 
     var final : JSX.Element[] = [];
     var term :any = 'term_5';
@@ -35,16 +30,18 @@ const Indicators = (props: any) => {
     var termType : string = "term_5";
     const p_values : string = "p_values";
     
-    var labels : string[] = [];
-    Object.entries(indicators).forEach(
+    var labelStrings : string[] = [];
+    var labels : StringBoolean = {};
+    Object.entries(props.indicators).forEach(
         ([key,value]) => {
-            labels.push(key);
+            labels[key] = true;
+            labelStrings.push(key);
         }
     );
 
     const [predictionTerm, updateTerm] = useState(5);
-    const [state, setState] = useState<StringBoolean[]>(labels.map(function(val:string) {return {val:true}}));
-    
+
+    const [state, setState] = useState<StringBoolean>(labels);
     const handleChange = (event: any, value: number | number[])  => {
         if(typeof(value)=="number") {
             updateTerm(value);
@@ -53,7 +50,7 @@ const Indicators = (props: any) => {
 
     const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState({ ...state, [event.target.name]: event.target.checked });
-      };
+    };
 
     const addGridOfX = (val:number) => {
         final.push(
@@ -64,26 +61,31 @@ const Indicators = (props: any) => {
 
     addGridOfX(5);
     final.push(
-        <div>
+        <Grid item lg={4}>
             <h1>Indicators</h1>
             <p>This page is used to determine which indicators are useful in a model to predict stock direction</p>
             <p>This plot shows indicators most likely to predict future stock direction</p>
-        </div>
+        </Grid>
     );
 
     /******************* double bar chart *****************************/
-    for(var i=0; i<f_regression[termType][p_values].length; i++) {
-        doubleData.push([i,predict[termType]['importance_values'][i], f_regression[termType][p_values][i]]);
+    for(var i=0; i<props.f_regression[termType][p_values].length; i++) {
+        doubleData.push([i,props.predict[termType]['importance_values'][i], props.f_regression[termType][p_values][i]]);
     };
 
-    final.push(<Grid item lg={4} key={key}><Card variant="outlined"><DoubleHorizontalBarChart labels={labels} data={doubleData}></DoubleHorizontalBarChart></Card></Grid>)
+    final.push(<Grid item lg={4} key={key}><Card variant="outlined"><DoubleHorizontalBarChart labels={labelStrings} data={doubleData}></DoubleHorizontalBarChart></Card></Grid>)
+
+    addGridOfX(2);
+    addGridOfX(2);
+    addGridOfX(2);
     
     /*** slider + indicator card **********/
-    const checkboxes = labels.map(function(val:string) { return <FormControlLabel control={<Checkbox checked={state[labels.indexOf(val)][val]} onChange={handleCheckBoxChange} name={val}></Checkbox>} label={val}></FormControlLabel>});
+
+    const checkboxes = labelStrings.map(function(val:string) { return <FormControlLabel control={<Checkbox checked={state[val]} onChange={handleCheckBoxChange} name={val}></Checkbox>} label={val}></FormControlLabel>});
 
     final.push(
         <Grid item lg={2}>
-            <Card>
+            <Card variant="outlined">
                 <FormControl component="fieldset">
                     <FormLabel component="legend">Select Indicators</FormLabel>
                     <FormGroup>
@@ -94,7 +96,8 @@ const Indicators = (props: any) => {
         </Grid>
     );
 
-    final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,60,1, []));
+
+    final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,props.dates.length-5,1, []));
 
     /*** Scatter Plots ****************** */
     keyPlot++;
@@ -102,19 +105,22 @@ const Indicators = (props: any) => {
     addGridOfX(5);
     addGridOfX(5);
     addGridOfX(5);
-    addGridOfX(5);
-    addGridOfX(5);
+    //console.log(labels);
+    console.log(state);
     
-    Object.entries(indicators).forEach(
+    Object.entries(props.indicators).forEach(
         ([key,value]) => {
-            var scatterData : any[][] = [];
-            for(var i=0; i<dates.length-predictionTerm; i++) {
-                scatterData[i] = [];
-                scatterData[i].push(cumReturn[i+predictionTerm] - cumReturn[i]);
-                scatterData[i].push(value[i]);
+            //console.log(labels.get(key));
+            if(state[key]) {
+                var scatterData : any[][] = [];
+                for(var i=0; i<props.dates.length-predictionTerm; i++) {
+                    scatterData[i] = [];
+                    scatterData[i].push(props.cum_return[i+predictionTerm] - props.cum_return[i]);
+                    scatterData[i].push(value[i]);
+                }
+                final.push(<Grid item lg={4} key={key}><Card variant="outlined"><ScatterChart data={scatterData} label={key}></ScatterChart></Card></Grid>);
+                keyPlot++;
             }
-            final.push(<Grid item lg={4} key={key}><Card variant="outlined"><ScatterChart data={scatterData} label={key}></ScatterChart></Card></Grid>);
-            keyPlot++;
         }
     );
 
@@ -124,4 +130,4 @@ const Indicators = (props: any) => {
 
 }
 
-export default Indicators;
+export default IndicatorsLayout;
