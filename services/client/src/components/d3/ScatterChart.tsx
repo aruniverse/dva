@@ -3,7 +3,6 @@ import * as d3 from "d3";
 import ChartUtils from "../utils/ChartUtils"
 
 const ScatterChart = (props : any) => {
-    //data: number[][], label: string
     const data : number[][] = props.data;
     const label : string = props.label;
 
@@ -35,13 +34,10 @@ const ScatterChart = (props : any) => {
         }
 
     }
-    //console.log("max x:", maxX);
-    //console.log(data);
 
     const xScale = d3.scaleLinear().range([0,width]).domain([minX,maxX]);
     const yScale = d3.scaleLinear().range([height,0]).domain([minY,maxY]);
 
-    //function addXYScatter(svg : d3.Selection<SVGGElement,unknown,null,undefined>, xScale : any, yScale : any, color : string, radius : number) {
     function addXYScatter(svg : d3.Selection<null, unknown, null, undefined>, xScale : any, yScale : any, color : string, radius : number) {
         svg.selectAll("circle")
         .data(data)
@@ -57,8 +53,6 @@ const ScatterChart = (props : any) => {
         const g = d3.select(canvas.current);
         g.selectAll("*").remove();
 
-        console.log("here");
-
         const possibleY = ChartUtils.undefinedHandler(d3.max([0,1-maxY/(maxY-minY)]),0);
         const yAxisShift = ChartUtils.undefinedHandler(d3.min([1,possibleY]),1);
 
@@ -73,7 +67,6 @@ const ScatterChart = (props : any) => {
 
     //https://medium.com/stationfive/how-to-create-a-pie-chart-with-d3-js-and-react-hooks-part-1-81bcd7f39b32
     return (
-        //<div ref={canvas}></div>
         <svg width={width+margin.left+margin.right} height={height+margin.top+margin.bottom}>
             <g
                 ref={canvas}
