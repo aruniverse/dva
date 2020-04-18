@@ -10,7 +10,7 @@ def check_date(date, df):
     return date
 
 
-json_df=pd.read_json('data.json')
+json_df=pd.read_json('data_low.json')
 print (json_df)
 
 
@@ -21,6 +21,6 @@ end_date=check_date(pd.to_datetime('2020-2-3'), json_df)
 print ('start index: ', json_df.loc[json_df['datetime']==start_date].index)
 print ('stop index: ', json_df.loc[json_df['datetime']==end_date].index)
 
-json_df.rename(inplace=True, columns={'open':'Open','high':'High','close':'Close','volume':'Volume','datetime':'Date'})
+json_df.rename(inplace=True, columns={'open':'Open','high':'High', 'low':'Low','close':'Close','volume':'Volume','datetime':'Date'})
 
 print ('renamed json:\n', json_df)
