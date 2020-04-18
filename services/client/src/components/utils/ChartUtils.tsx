@@ -73,9 +73,9 @@ export class ChartUtils {
             svg.append("path")
             .datum(dataset)
             .style("stroke",d.color)
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 3)
             .style("fill","none")
-            .attr("d", line2);     
+            .attr("d", line2);
         } else {
             svg.append("circle")
                 .attr("cx",25)
