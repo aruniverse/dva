@@ -349,6 +349,7 @@ const LoadChart = () => {
     const [longExit, setLongExit] = useState(3);
     const [shortEnter, setShortEnter] = useState(1);
     const [shortExit, setShortExit] = useState(2);
+    const [rsiFlip, setrsiFlip] = useState(50);
 
 
     const handleEnterLong = (event: any, value: number | number[]) => {
@@ -376,6 +377,12 @@ const LoadChart = () => {
         }
     };
 
+    const handleRSIShort = (event: any, value: number | number[])  => {
+        if(typeof(value)=="number") {
+            setrsiFlip(value);
+        }
+    }
+
     const addGridOfX = (val:number) => {
         final.push(
             <Grid item lg={2}></Grid>
@@ -389,6 +396,7 @@ const LoadChart = () => {
     final.push(SliderCard(handleExitShort, "Exit Short", "Select cutoff percentage where strategy exit short position", 0,5,3, data.move));
     addGridOfX(2);
     addGridOfX(5);
+    final.push(SliderCard(handleRSIShort, "RSI", "Select RSI value to go long/short", 1,99,50, []));
 
     /******************* double bar chart *****************************/
     var term :any = 'term_5';
@@ -439,11 +447,41 @@ const LoadChart = () => {
         }
     );
 
+    var currentTrade = CurrentPosition.Neutral;
+    var currentPortfolioValue = 10000;
+    var tempChanges : number[] = [];
+       
+    for (i=0; i<data['indicators']['rel_strength'].length; i++) {
+        var predict_move_rsi=data['indicators']['rel_strength'][i];
+        changedPostion = LastPositionChange.NoChange;
+        //check long position
+        if(predict_move_rsi>=rsiFlip) {
+            if(currentTrade==CurrentPosition.Short) {
+                changedPostion = LastPositionChange.EnterLong;
+            }
+            currentTrade = CurrentPosition.Long;
+            currentPortfolioValue *= (1+data['daily_ret'][i])
+        } else{
+            if(currentTrade==CurrentPosition.Long) {
+                changedPostion = LastPositionChange.EnterShort
+            }
+            currentTrade = CurrentPosition.Short;
+            currentPortfolioValue *= (1-data['daily_ret'][i])
+        }      
+
+        returnData[i][j] = currentPortfolioValue;
+        tempChanges.push(changedPostion);
+    };
+
+    trades.push(tempChanges);
+    strategyLabels.push("RSI at " + rsiFlip);
+    j++;
+
 
     var currentTrade = CurrentPosition.Neutral;
     var changedPostion = LastPositionChange.NoChange;
-    var currentPortfolioValue = 10000;
-    var tempChanges : number[] = [];
+    currentPortfolioValue = 10000;
+    tempChanges = [];
     
     for (i=0; i<data['predict']['term_60']['predict'].length; i++) {
         var predictedMove=data['predict']['term_60']['predict'][i];
