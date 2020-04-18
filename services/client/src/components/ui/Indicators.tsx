@@ -92,12 +92,9 @@ const Indicators = (props: any) => {
                 </FormControl>
             </Card>
         </Grid>
-
     );
 
     final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,60,1, []));
-
-
 
     /*** Scatter Plots ****************** */
     keyPlot++;
