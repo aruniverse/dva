@@ -184,7 +184,7 @@ class price_analysis:
             period_rsi=self.parameters['indicator']['rel_strength']['parameters']['period']
             self.df_anal['rel_strength']=ta.momentum.rsi(self.df_data['Close'], period_rsi)
 
-        self.results['predict']['indicator_list']=self.indicator_list
+        self.results['indicator_list']=self.indicator_list
         self.random_forest_analysis()
         self.f_test_analysis()
         
