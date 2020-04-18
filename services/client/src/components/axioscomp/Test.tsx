@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import axios from "axios";
-import { StockSymbol } from "../../types/Symbol";
+import { StockSymbol } from "../../types";
 import { Button, CircularProgress, Grid, Input } from "@material-ui/core";
 import {
   KeyboardDatePicker,
@@ -103,5 +103,4 @@ const Test = () => {
   );
 };
 
-// export default withMainContainer(Test);
-export default Test;
+export default withMainContainer(Test);
