@@ -252,7 +252,7 @@ class price_analysis:
             
     def f_test_analysis(self):
         self.df_anal.dropna(inplace=True)
-        self.results['f_regression']['indicator_list']=self.indicator_list
+        #self.results['f_regression']['indicator_list']=self.indicator_list
         
         for term in self.parameters['term']:
             x_data=self.df_anal.loc[:,self.indicator_list]
