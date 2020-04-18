@@ -323,7 +323,7 @@ const LoadChart = () => {
                     5.0, 5.0, 5.0, 5.0, 5.0, 1.0, 4.0, 4.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 6.0, 5.0, 5.0, 5.0, 
                     5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 5.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 1.0, 5.0, 1.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 
                     2.0, 2.0, 4.0, 2.0, 4.0, 4.0, 4.0, 2.0, 2.0, 2.0, 2.0]
-            } , 
+            }, 
             "term_60": {
                 "train_score": 0.968503937007874, "test_score": 0.7906976744186046, "importance_values": [0.3166176319639606, 0.11887157670482773, 
                 0.0870183790701539, 0.17135945782931813, 0.3061329544317396], "importance_order": [0, 4, 3, 1, 2], 
@@ -388,6 +388,12 @@ const LoadChart = () => {
             <Grid item lg={2}></Grid>
         );
     }
+        
+    const handleChange = (event: any, value: number | number[])  => {
+        if(typeof(value)=="number") {
+            updateTerm(value);
+        }
+    };
 
     addGridOfX(2);
     final.push(SliderCard(handleEnterLong, "Enter Long", "Select cutoff percentage where strategy enters long position", 0,5,4, data.move));
@@ -397,6 +403,13 @@ const LoadChart = () => {
     addGridOfX(2);
     addGridOfX(5);
     final.push(SliderCard(handleRSIShort, "RSI", "Select RSI value to go long/short", 1,99,50, []));
+    addGridOfX(2);
+    addGridOfX(2);
+    final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,60,1, []));
+    addGridOfX(2);
+    addGridOfX(2);
+
+    
 
     /******************* double bar chart *****************************/
     var term :any = 'term_5';
@@ -539,17 +552,10 @@ const LoadChart = () => {
 
     /*** Scatter Plots ****************** */
     keyPlot++;
-    
-    const handleChange = (event: any, value: number | number[])  => {
-        if(typeof(value)=="number") {
-            updateTerm(value);
-        }
-    };
 
     addGridOfX(5);
     addGridOfX(5);
     addGridOfX(5);
-    final.push(SliderCard(handleChange, "Enter prediction term", "Select term to compare gain vs indicator", 1,60,1, data.move));
     addGridOfX(5);
     addGridOfX(5);
     
