@@ -20,6 +20,48 @@ interface IndicatorsLayoutProps {
   data: StockAnalysis;
 }
 
+interface IndicatorTextMapInterface {
+  [key: string]: {
+    label: string;
+    description: string;
+    more: string;
+  };
+}
+
+const IndicatorTextMap: IndicatorTextMapInterface = {
+  acc_dist_index: {
+    label: "Accumulation/Distribution Index",
+    description: "An indicator intended to relate price and volume.",
+    more: "https://en.wikipedia.org/wiki/Accumulation/distribution_index",
+  },
+  chaikin_money_flow: {
+    label: "Chaikin Money flow",
+    description:
+      "Measures the amount of Money Flow Volume over a specific period.",
+    more:
+      "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_money_flow_cmf",
+  },
+  ease_of_move: {
+    label: "Ease of Movement",
+    description:
+      "Relates an asset's price change to its volume and is particularly useful for assessing the strength of a trend.",
+    more: "https://en.wikipedia.org/wiki/Ease_of_movement",
+  },
+  williams_r: {
+    label: "Williams R",
+    description:
+      "Reflects the level of the close relative to the highest high for the look-back period. ",
+    more:
+      "https://school.stockcharts.com/doku.php?id=technical_indicators:williams_r",
+  },
+  rel_strength: {
+    label: "Relative Strength Index",
+    description:
+      "Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security.",
+    more: "https://www.investopedia.com/terms/r/rsi.asp",
+  },
+};
+
 export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   var final: JSX.Element[] = [];
   var doubleData = [];
@@ -30,7 +72,8 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
 
   var labelStrings: string[] = data.indicator_list;
   var labels: StringBoolean = {};
-  Object.entries(data.indicators).forEach(([key, value]) => {
+
+  Object.entries(data.indicators).forEach(([key]) => {
     labels[key] = true;
   });
 
@@ -44,7 +87,7 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   };
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({ ...state, [event.target.name]: event.target.checked });
+    setState({ ...state, [event.target.value]: event.target.checked });
   };
 
   const addGridOfX = (val: number) => {
@@ -66,7 +109,7 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
     <Grid item lg={4} key={key}>
       <Card variant="outlined">
         <DoubleHorizontalBarChart
-          labels={labelStrings}
+          labels={labelStrings.map((val) => IndicatorTextMap[val].label)}
           data={doubleData}
         ></DoubleHorizontalBarChart>
         <p style={{ textAlign: "center" }}>
@@ -86,10 +129,10 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
           <Checkbox
             checked={state[val]}
             onChange={handleCheckBoxChange}
-            name={val}
+            value={val}
           ></Checkbox>
         }
-        label={val}
+        label={IndicatorTextMap[val].label}
       ></FormControlLabel>
     );
   });
@@ -120,10 +163,6 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   /*** Scatter Plots ****************** */
   keyPlot++;
 
-  addGridOfX(5);
-  addGridOfX(5);
-  addGridOfX(5);
-
   Object.entries(data.indicators).forEach(([key, value]) => {
     //console.log(labels.get(key));
     if (state[key]) {
@@ -138,8 +177,23 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
       final.push(
         <Grid item lg={4} key={key}>
           <Card variant="outlined">
-            <ScatterChart data={scatterData} label={key}></ScatterChart>
+            <ScatterChart
+              data={scatterData}
+              label={IndicatorTextMap[key].label}
+            ></ScatterChart>
           </Card>
+          <p style={{ textAlign: "center" }}>
+            {IndicatorTextMap[key].description}
+          </p>
+          <div className="MoreInfo" style={{ textAlign: "right" }}>
+            <a
+              href={IndicatorTextMap[key].more}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {"For More Info"}
+            </a>
+          </div>
         </Grid>
       );
       keyPlot++;
