@@ -175,7 +175,7 @@ const LoadChart = () => {
   var term: any = "term_5";
   var doubleData = [];
   var key = "fasdklj";
-  for (var i = 0; i < data.f_regression.indicator_list.length; i++) {
+  for (var i = 0; i < 5; i++) {
     doubleData.push([
       i,
       data.predict.term_5.importance_values[i],
@@ -237,7 +237,7 @@ const LoadChart = () => {
   var currentPortfolioValue = 10000;
   var tempChanges: number[] = [];
 
-  for (i = 0; i < data["indicators"]["rel_strength"].length; i++) {
+  for (i = 0; i < data.indicators["rel_strength"].length; i++) {
     var predict_move_rsi = data["indicators"]["rel_strength"][i];
     changedPostion = LastPositionChange.NoChange;
     //check long position

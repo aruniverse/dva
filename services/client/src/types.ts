@@ -23,11 +23,7 @@ interface Strategy {
 }
 
 interface Indicators {
-  acc_dist_index: number[];
-  chaikin_money_flow: number[];
-  ease_of_move: number[];
-  williams_r: number[];
-  rel_strength: number[];
+  [id:string]:number[]
 }
 
 interface PredictTermValues {
@@ -39,10 +35,7 @@ interface PredictTermValues {
 }
 
 interface Predict {
-  indicator_list: string[];
-  term_5: PredictTermValues;
-  term_20: PredictTermValues;
-  term_60: PredictTermValues;
+  [id:string]: PredictTermValues;
 }
 
 interface RegressionTermValues {
@@ -50,10 +43,7 @@ interface RegressionTermValues {
 }
 
 interface Regression {
-  indicator_list: string[];
-  term_5: RegressionTermValues;
-  term_20: RegressionTermValues;
-  term_60: RegressionTermValues;
+  [id:string]: {[id:string]:number[]}
 }
 
 export interface StockAnalysis {
@@ -62,6 +52,7 @@ export interface StockAnalysis {
   cum_return: number[];
   term: number[];
   move: number[];
+  price: number[];
   strategy: Strategy;
   indicators: Indicators;
   predict: Predict;
