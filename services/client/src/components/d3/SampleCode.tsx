@@ -13,7 +13,7 @@ import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
 //import CurrentPosition from "../../utils/CurrentPosition";
 import axios from "axios";
-import { sample_data } from "../../data/sample";
+import { SampleData1 } from "../../data/sample";
 
 export enum CurrentPosition {
   Short = 1,
@@ -30,7 +30,7 @@ export enum LastPositionChange {
 }
 
 const LoadChart = () => {
-  const [data, setData] = useState<StockAnalysis>(sample_data);
+  const [data, setData] = useState<StockAnalysis>(SampleData1);
   var final: JSX.Element[] = [];
   const [predictionTerm, updateTerm] = useState(5);
   const [longEnter, setLongEnter] = useState(4);

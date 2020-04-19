@@ -8,18 +8,17 @@ const Sidebar = () => {
   const PageTabName = [
     "Home",
     "Form",
-    "Charts",
-    "Old",
     "Indicators",
     "Strategies",
+    "Charts",
+    "Old",
   ];
-  const PageTabRoute = ["/", "form", "charts", "old"];
 
   return (
     <Drawer open variant="permanent" anchor="left" className="Sidebar">
       <List>
-        {PageTabName.map((text, index) => (
-          <NavLink to={PageTabRoute[index] ?? text}>
+        {PageTabName.map((text) => (
+          <NavLink to={text}>
             <ListItem button key={text}>
               <ListItemText primary={text} />
             </ListItem>
