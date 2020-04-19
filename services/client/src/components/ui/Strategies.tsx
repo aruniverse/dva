@@ -4,35 +4,38 @@ import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import LineChart from "../d3/LineChart";
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import FormLabel from "@material-ui/core/FormLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 import SliderCard from "../ui/SliderCard";
-import Typography from '@material-ui/core/Typography';
-import Slider from '@material-ui/core/Slider';
+import Typography from "@material-ui/core/Typography";
+import Slider from "@material-ui/core/Slider";
 
 export enum CurrentPosition {
-    Short = 1,
-    Neutral = 2,
-    Long = 3,
-  }
-  
-  export enum LastPositionChange {
-    NoChange = -1,
-    ExitLong = 0,
-    EnterLong = 1,
-    ExitShort = 2,
-    EnterShort = 3,
-  }
+  Short = 1,
+  Neutral = 2,
+  Long = 3,
+}
 
-  interface StringBoolean {
-    [id:string]:boolean
-  }
+export enum LastPositionChange {
+  NoChange = -1,
+  ExitLong = 0,
+  EnterLong = 1,
+  ExitShort = 2,
+  EnterShort = 3,
+}
 
-const StrategiesLayout = (data: StockAnalysis) => {
+interface StringBoolean {
+  [id: string]: boolean;
+}
 
+interface StrategiesLayoutProps {
+  data: StockAnalysis;
+}
+
+const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   var final: JSX.Element[] = [];
   const [predictionTerm, updateTerm] = useState(5);
   const [longEnter, setLongEnter] = useState(4);
@@ -41,18 +44,15 @@ const StrategiesLayout = (data: StockAnalysis) => {
   const [shortExit, setShortExit] = useState(2);
   const [rsiFlip, setrsiFlip] = useState(50);
 
-    
-    const handleRSIShort = (event: any, value: number | number[]) => {
-        if (typeof value == "number") {
-        setrsiFlip(value);
-        }
-    };
-  
-  const addGridOfX = (val:number) => {
-    final.push(
-        <Grid item lg={2}></Grid>
-    );
+  const handleRSIShort = (event: any, value: number | number[]) => {
+    if (typeof value == "number") {
+      setrsiFlip(value);
     }
+  };
+
+  const addGridOfX = (val: number) => {
+    final.push(<Grid item lg={2}></Grid>);
+  };
   //Strategies heading / explanation
 
   const handleEnterLong = (event: any, value: number | number[]) => {
@@ -79,13 +79,12 @@ const StrategiesLayout = (data: StockAnalysis) => {
     }
   };
 
-  const handleChange = (event: any, value: number | number[])  => {
-      if(typeof(value)=="number") {
-          updateTerm(value);
-      }
+  const handleChange = (event: any, value: number | number[]) => {
+    if (typeof value == "number") {
+      updateTerm(value);
+    }
   };
 
-    
   /* ************ line chart ***************************/
   var keyPlot = 1098;
   const startPrice = 10000;
@@ -119,15 +118,15 @@ const StrategiesLayout = (data: StockAnalysis) => {
     for (i = 0; i < value["cum_return"].length; i++) {
       returnData[i][j] = startPrice * (1 + value["cum_return"][i]);
     }
-    k=0;
-    for(i=0; i<data.dates.length; i++) {
-        var date1 = new Date(data.dates[i]);
-        var date2 = new Date(value["actions"][k][0]);
-        if(date1 > date2) {
-            k++;
-        } else {
-            break;
-        }
+    k = 0;
+    for (i = 0; i < data.dates.length; i++) {
+      var date1 = new Date(data.dates[i]);
+      var date2 = new Date(value["actions"][k][0]);
+      if (date1 > date2) {
+        k++;
+      } else {
+        break;
+      }
     }
     trades[j] = data.dates.map((d) =>
       d === value["actions"][k][0] ? getType(value["actions"][k++]) : -1
@@ -157,7 +156,7 @@ const StrategiesLayout = (data: StockAnalysis) => {
         changedPostion = LastPositionChange.EnterShort;
       }
       currentTrade = CurrentPosition.Short;
-      currentPortfolioValue *= (1 - data["daily_ret"][i]);
+      currentPortfolioValue *= 1 - data["daily_ret"][i];
     }
 
     returnData[i][j] = currentPortfolioValue;
@@ -175,8 +174,8 @@ const StrategiesLayout = (data: StockAnalysis) => {
   currentPortfolioValue = 10000;
   tempChanges = [];
 
-  for (i = 0; i < data.predict["term_"+predictionTerm].predict.length; i++) {
-    var predictedMove = data.predict["term_"+predictionTerm].predict[i];
+  for (i = 0; i < data.predict["term_" + predictionTerm].predict.length; i++) {
+    var predictedMove = data.predict["term_" + predictionTerm].predict[i];
     changedPostion = LastPositionChange.NoChange;
 
     //check long position
@@ -185,7 +184,7 @@ const StrategiesLayout = (data: StockAnalysis) => {
         if (predictedMove < shortEnter) {
           currentTrade = CurrentPosition.Short;
           changedPostion = LastPositionChange.EnterShort;
-          priceExit = currentPortfolioValue*(1-shortExit/100);
+          priceExit = currentPortfolioValue * (1 - shortExit / 100);
         } else {
           currentTrade = CurrentPosition.Neutral;
           changedPostion = LastPositionChange.ExitLong;
@@ -195,11 +194,11 @@ const StrategiesLayout = (data: StockAnalysis) => {
       if (predictedMove >= longEnter) {
         currentTrade = CurrentPosition.Long;
         changedPostion = LastPositionChange.EnterLong;
-        priceExit = currentPortfolioValue*(1+longExit/100);
+        priceExit = currentPortfolioValue * (1 + longExit / 100);
       } else if (predictedMove <= shortEnter) {
         currentTrade = CurrentPosition.Short;
         changedPostion = LastPositionChange.EnterShort;
-        priceExit = currentPortfolioValue*(1-shortExit/100);
+        priceExit = currentPortfolioValue * (1 - shortExit / 100);
       }
     } else {
       // currently shorting
@@ -207,8 +206,7 @@ const StrategiesLayout = (data: StockAnalysis) => {
         if (predictedMove > longEnter) {
           currentTrade = CurrentPosition.Long;
           changedPostion = LastPositionChange.EnterLong;
-          priceExit = currentPortfolioValue*(1+longExit/100);
-
+          priceExit = currentPortfolioValue * (1 + longExit / 100);
         } else {
           currentTrade = CurrentPosition.Neutral;
           changedPostion = LastPositionChange.ExitShort;
@@ -232,34 +230,45 @@ const StrategiesLayout = (data: StockAnalysis) => {
   j++;
   currentPortfolioValue = 10000;
   tempChanges = [];
-  for(i=0; i<data.daily_ret.length; i++) {
-    returnData[i][j] = currentPortfolioValue*(1+data.daily_ret[i]);
-    tempChanges[i]=-1;
+  for (i = 0; i < data.daily_ret.length; i++) {
+    returnData[i][j] = currentPortfolioValue * (1 + data.daily_ret[i]);
+    tempChanges[i] = -1;
   }
   trades.push(tempChanges);
-  // 
-  var strategyLabelsMap : StringBoolean = {};
+  //
+  var strategyLabelsMap: StringBoolean = {};
 
   const [state, setState] = useState<StringBoolean>(strategyLabelsMap);
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setState({ ...state, [event.target.name]: event.target.checked });
+    setState({ ...state, [event.target.name]: event.target.checked });
   };
-  const checkboxes = strategyLabels.map(function(val:string) { return <FormControlLabel control={<Checkbox checked={state[val]} onChange={handleCheckBoxChange} name={val}></Checkbox>} label={val}></FormControlLabel>});
+  const checkboxes = strategyLabels.map(function (val: string) {
+    return (
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={state[val]}
+            onChange={handleCheckBoxChange}
+            name={val}
+          ></Checkbox>
+        }
+        label={val}
+      ></FormControlLabel>
+    );
+  });
 
   final.push(
-      <Grid item lg={2} key={"strategies"}>
-          <Card variant="outlined">
-              <CardContent>
-                  <FormControl component="fieldset">
-                      <FormLabel component="legend">Select Strategies to Show</FormLabel>
-                      <FormGroup>
-                          {checkboxes}
-                      </FormGroup>
-                  </FormControl>
-              </CardContent>
-          </Card>
-      </Grid>
+    <Grid item lg={2} key={"strategies"}>
+      <Card variant="outlined">
+        <CardContent>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Select Strategies to Show</FormLabel>
+            <FormGroup>{checkboxes}</FormGroup>
+          </FormControl>
+        </CardContent>
+      </Card>
+    </Grid>
   );
 
   // push strategy filter before ...
@@ -280,135 +289,143 @@ const StrategiesLayout = (data: StockAnalysis) => {
   // strategy parameters
 
   var marks = [];
-  for(i=0; i<data.move.length; i++) {
-      marks.push({value:i+1,label:String(data.move[i]+"%")})
+  for (i = 0; i < data.move.length; i++) {
+    marks.push({ value: i + 1, label: String(data.move[i] + "%") });
   }
 
-  var marksTerms : any[] = [];
-  for(i=0; i<data.term.length; i++) {
-    marksTerms.push({value:data.term[i],label:String(data.term[i])})
-  }   
+  var marksTerms: any[] = [];
+  for (i = 0; i < data.term.length; i++) {
+    marksTerms.push({ value: data.term[i], label: String(data.term[i]) });
+  }
 
   final.push(
     <Grid key={"randomForest"} item lg={2}>
-
-    <Card variant="outlined">
+      <Card variant="outlined">
         <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Random Forest Parameters"}:</b>
+          <b>{"Random Forest Parameters"}:</b>
         </Typography>
         <Card variant="outlined">
-            <CardContent>
-                <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Enter Long"}:</b>
-                </Typography>
-                <p>
-                    {"Select cutoff percentage where strategy enters long position"}
-                </p>
-                <Slider
-                    name="enterLong"
-                    defaultValue={3}
-                    step={1}
-                    marks={marks}
-                    min={1}
-                    max={6}
-                    onChange={handleEnterLong}
-                    valueLabelDisplay="auto"
-                />
-            </CardContent>
+          <CardContent>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+              <b>{"Enter Long"}:</b>
+            </Typography>
+            <p>
+              {"Select cutoff percentage where strategy enters long position"}
+            </p>
+            <Slider
+              name="enterLong"
+              defaultValue={3}
+              step={1}
+              marks={marks}
+              min={1}
+              max={6}
+              onChange={handleEnterLong}
+              valueLabelDisplay="auto"
+            />
+          </CardContent>
         </Card>
         <Card variant="outlined">
-            <CardContent>
-                <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Exit Long"}:</b>
-                </Typography>
-                <p>
-                    {"Select cutoff percentage where strategy exits long position"}
-                </p>
-                <Slider
-                    name={"exitLong"}
-                    defaultValue={0}
-                    step={0.01}
-                    marks={[]}
-                    min={0}
-                    max={5}
-                    onChange={handleExitLong}
-                    valueLabelDisplay="auto"
-                />
-            </CardContent>
+          <CardContent>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+              <b>{"Exit Long"}:</b>
+            </Typography>
+            <p>
+              {"Select cutoff percentage where strategy exits long position"}
+            </p>
+            <Slider
+              name={"exitLong"}
+              defaultValue={0}
+              step={0.01}
+              marks={[]}
+              min={0}
+              max={5}
+              onChange={handleExitLong}
+              valueLabelDisplay="auto"
+            />
+          </CardContent>
         </Card>
 
         <Card variant="outlined">
-            <CardContent>
-                <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Exit Short"}:</b>
-                </Typography>
-                <p>
-                    {"Select cutoff percentage where strategy exits short position"}
-                </p>
-                <Slider
-                    name={"exitShort"}
-                    defaultValue={0}
-                    step={0.01}
-                    marks={[]}
-                    min={-5}
-                    max={0}
-                    onChange={handleExitShort}
-                    valueLabelDisplay="auto"
-                />
-            </CardContent>
+          <CardContent>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+              <b>{"Exit Short"}:</b>
+            </Typography>
+            <p>
+              {"Select cutoff percentage where strategy exits short position"}
+            </p>
+            <Slider
+              name={"exitShort"}
+              defaultValue={0}
+              step={0.01}
+              marks={[]}
+              min={-5}
+              max={0}
+              onChange={handleExitShort}
+              valueLabelDisplay="auto"
+            />
+          </CardContent>
         </Card>
 
         <Card variant="outlined">
-            <CardContent>
-                <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Enter Short"}:</b>
-                </Typography>
-                <p>
-                    {"Select cutoff percentage where strategy exits short position"}
-                </p>
-                <Slider
-                    name={"enterShort"}
-                    defaultValue={3}
-                    marks={marks}
-                    min={1}
-                    max={6}
-                    onChange={handleEnterShort}
-                    valueLabelDisplay="auto"
-                />
-            </CardContent>
+          <CardContent>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+              <b>{"Enter Short"}:</b>
+            </Typography>
+            <p>
+              {"Select cutoff percentage where strategy exits short position"}
+            </p>
+            <Slider
+              name={"enterShort"}
+              defaultValue={3}
+              marks={marks}
+              min={1}
+              max={6}
+              onChange={handleEnterShort}
+              valueLabelDisplay="auto"
+            />
+          </CardContent>
         </Card>
 
         <Card variant="outlined">
-            <CardContent>
-                <Typography id="discrete-slider-small-steps" gutterBottom>
-                    <b>{"Enter prediction term"}:</b>
-                </Typography>
-                <p>
-                    {"Select length of term that random forest trains on"}
-                </p>
-                <Slider
-                    defaultValue={5}
-                    step={null}
-                    marks={marksTerms}
-                    min={0}
-                    max={40}
-                    onChange={handleChange}
-                    valueLabelDisplay="auto"
-                />
-            </CardContent>
+          <CardContent>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+              <b>{"Enter prediction term"}:</b>
+            </Typography>
+            <p>{"Select length of term that random forest trains on"}</p>
+            <Slider
+              defaultValue={5}
+              step={null}
+              marks={marksTerms}
+              min={0}
+              max={40}
+              onChange={handleChange}
+              valueLabelDisplay="auto"
+            />
+          </CardContent>
         </Card>
-    </Card>
+      </Card>
     </Grid>
-); 
+  );
 
   final.push(
-    SliderCard(     handleRSIShort,"RSI",  "Select RSI value to go long/short",   1,   99,  50,  []
+    SliderCard(
+      handleRSIShort,
+      "RSI",
+      "Select RSI value to go long/short",
+      1,
+      99,
+      50,
+      []
     )
   );
 
   return (
-    <div><Grid container spacing={1}>{final}</Grid></div>
+    <div>
+      <Grid container spacing={1}>
+        {final}
+      </Grid>
+    </div>
   );
-}
+};
 
 export default StrategiesLayout;

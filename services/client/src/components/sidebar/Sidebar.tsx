@@ -5,14 +5,7 @@ import { NavLink } from "react-router-dom";
 import "./Sidebar.scss";
 
 const Sidebar = () => {
-  const PageTabName = [
-    "Home",
-    // "Form",
-    "Indicators",
-    "Strategies",
-    // "Charts",
-    // "Old",
-  ];
+  const PageTabName = ["Home", "Indicators", "Strategies"];
 
   return (
     <Drawer open variant="permanent" anchor="left" className="Sidebar">
