@@ -29,25 +29,25 @@ const StrategiesPage = () => {
 
   const getData = async () => {
     setLoading(true);
-    const response = await httpClient.get(API_ENDPOINT, {
-      params: {
-        symbol: ticker,
-        start_date: FormatDate(startDate),
-        end_date: FormatDate(endDate),
-      },
-    });
-    const { status, statusText, data } = response;
-    console.log(response);
-    if (status == 200) {
-      setData(data);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      console.log(status, statusText);
-      //   throw new Error(statusText);
-    }
-    // setData(SampleData2);
-    // setLoading(false);
+    // const response = await httpClient.get(API_ENDPOINT, {
+    //   params: {
+    //     symbol: ticker,
+    //     start_date: FormatDate(startDate),
+    //     end_date: FormatDate(endDate),
+    //   },
+    // });
+    // const { status, statusText, data } = response;
+    // console.log(response);
+    // if (status == 200) {
+    //   setData(data);
+    //   setLoading(false);
+    // } else {
+    //   setLoading(false);
+    //   console.log(status, statusText);
+    //   //   throw new Error(statusText);
+    // }
+    setData(SampleData2);
+    setLoading(false);
   };
 
   return (

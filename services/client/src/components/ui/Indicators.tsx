@@ -124,8 +124,6 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   addGridOfX(5);
   addGridOfX(5);
   addGridOfX(5);
-  //console.log(labels);
-  console.log(state);
 
   Object.entries(data.indicators).forEach(([key, value]) => {
     //console.log(labels.get(key));
