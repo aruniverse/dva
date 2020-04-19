@@ -12,6 +12,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import SliderCard from "../ui/SliderCard";
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
+import { SampleData2 } from "../../data/sample2";
 
 export enum CurrentPosition {
     Short = 1,
@@ -31,7 +32,17 @@ export enum CurrentPosition {
     [id:string]:boolean
   }
 
-const StrategiesLayout = (data: StockAnalysis) => {
+const StrategiesLayout = () => {
+
+  var data = SampleData2;
+  var keyPlot = 1098;
+  const startPrice = 10000;
+  var j = 0;
+  var dates: Date[] = [];
+  var returnData: number[][] = [];
+  var strategyLabels = ["bollinger", "williams_r", "RSI", "Random Forest", "Buy and Hold"];
+  var trades: number[][] = [];
+  var k = 0;
 
   var final: JSX.Element[] = [];
   const [predictionTerm, updateTerm] = useState(5);
@@ -40,21 +51,20 @@ const StrategiesLayout = (data: StockAnalysis) => {
   const [shortEnter, setShortEnter] = useState(1);
   const [shortExit, setShortExit] = useState(2);
   const [rsiFlip, setrsiFlip] = useState(50);
+  var strategyLabelsMap : StringBoolean = {};
 
-    
-    const handleRSIShort = (event: any, value: number | number[]) => {
+    // 
+  for(i=0; i<strategyLabels.length; i++) {
+    strategyLabelsMap[strategyLabels[i]]=true;
+  }
+
+  const [state, setState] = useState<StringBoolean>(strategyLabelsMap);   
+  const handleRSIShort = (event: any, value: number | number[]) => {
         if (typeof value == "number") {
         setrsiFlip(value);
         }
     };
   
-  const addGridOfX = (val:number) => {
-    final.push(
-        <Grid item lg={2}></Grid>
-    );
-    }
-  //Strategies heading / explanation
-
   const handleEnterLong = (event: any, value: number | number[]) => {
     if (typeof value == "number") {
       setLongEnter(value);
@@ -87,53 +97,44 @@ const StrategiesLayout = (data: StockAnalysis) => {
 
     
   /* ************ line chart ***************************/
-  var keyPlot = 1098;
-  const startPrice = 10000;
-  var j = 0;
-  var dates: Date[] = [];
-  var returnData: number[][] = [];
-  var strategyLabels = [];
 
   for (var i = 0; i < data["dates"].length; i++) {
     dates.push(new Date(data["dates"][i]));
     returnData[i] = [];
   }
 
-  var j = 0;
-  var trades: number[][] = [];
-  var k = 0;
-
   //process strategies straight from strategies
   const getType = (vals: string[]): number => {
     var val = 0;
-    if (vals[1] == "enter") {
+    if (vals[1] === "enter") {
       val += 1;
     }
-    if (vals[2] == "short") {
+    if (vals[2] === "short") {
       val += 2;
     }
     return val;
   };
 
   Object.entries(data["strategy"]).forEach(([key, value]) => {
-    for (i = 0; i < value["cum_return"].length; i++) {
-      returnData[i][j] = startPrice * (1 + value["cum_return"][i]);
+    if(state[key]) {
+      for (i = 0; i < value["cum_return"].length; i++) {
+        returnData[i][j] = startPrice * (1 + value["cum_return"][i]);
+      }
+      k=0;
+      for(i=0; i<data.dates.length; i++) {
+          var date1 = new Date(data.dates[i]);
+          var date2 = new Date(value["actions"][k][0]);
+          if(date1 > date2) {
+              k++;
+          } else {
+              break;
+          }
+      }
+      trades[j] = data.dates.map((d) =>
+        d === value["actions"][k][0] ? getType(value["actions"][k++]) : -1
+      );
+      j++;
     }
-    k=0;
-    for(i=0; i<data.dates.length; i++) {
-        var date1 = new Date(data.dates[i]);
-        var date2 = new Date(value["actions"][k][0]);
-        if(date1 > date2) {
-            k++;
-        } else {
-            break;
-        }
-    }
-    trades[j] = data.dates.map((d) =>
-      d === value["actions"][k][0] ? getType(value["actions"][k++]) : -1
-    );
-    strategyLabels.push(key);
-    j++;
   });
 
   var currentTrade = CurrentPosition.Neutral;
@@ -142,31 +143,33 @@ const StrategiesLayout = (data: StockAnalysis) => {
   var tempChanges: number[] = [];
 
   // Process data for RSI strategy
-  for (i = 0; i < data.indicators["rel_strength"].length; i++) {
-    var predict_move_rsi = data["indicators"]["rel_strength"][i];
-    changedPostion = LastPositionChange.NoChange;
-    //check long position
-    if (predict_move_rsi >= rsiFlip) {
-      if (currentTrade == CurrentPosition.Short) {
-        changedPostion = LastPositionChange.EnterLong;
+  if(state["RSI"]) {
+    for (i = 0; i < data.indicators["rel_strength"].length; i++) {
+      var predict_move_rsi = data["indicators"]["rel_strength"][i];
+      changedPostion = LastPositionChange.NoChange;
+      //check long position
+      if (predict_move_rsi >= rsiFlip) {
+        if (currentTrade === CurrentPosition.Short) {
+          changedPostion = LastPositionChange.EnterLong;
+        }
+        currentTrade = CurrentPosition.Long;
+        currentPortfolioValue *= 1 + data["daily_ret"][i];
+      } else {
+        if (currentTrade === CurrentPosition.Long) {
+          changedPostion = LastPositionChange.EnterShort;
+        }
+        currentTrade = CurrentPosition.Short;
+        currentPortfolioValue *= (1 - data["daily_ret"][i]);
       }
-      currentTrade = CurrentPosition.Long;
-      currentPortfolioValue *= 1 + data["daily_ret"][i];
-    } else {
-      if (currentTrade == CurrentPosition.Long) {
-        changedPostion = LastPositionChange.EnterShort;
-      }
-      currentTrade = CurrentPosition.Short;
-      currentPortfolioValue *= (1 - data["daily_ret"][i]);
+
+      returnData[i][j] = currentPortfolioValue;
+      tempChanges.push(changedPostion);
     }
 
-    returnData[i][j] = currentPortfolioValue;
-    tempChanges.push(changedPostion);
+    trades.push(tempChanges);
+    //strategyLabels.push("RSI at " + rsiFlip);
+    j++;
   }
-
-  trades.push(tempChanges);
-  strategyLabels.push("RSI at " + rsiFlip);
-  j++;
 
   // Process data for random forest strategy
   var priceExit = 0;
@@ -175,72 +178,69 @@ const StrategiesLayout = (data: StockAnalysis) => {
   currentPortfolioValue = 10000;
   tempChanges = [];
 
-  for (i = 0; i < data.predict["term_"+predictionTerm].predict.length; i++) {
-    var predictedMove = data.predict["term_"+predictionTerm].predict[i];
-    changedPostion = LastPositionChange.NoChange;
+  if(state['Random Forest']) {
+    for (i = 0; i < data.predict["term_"+predictionTerm].predict.length; i++) {
+      var predictedMove = data.predict["term_"+predictionTerm].predict[i];
+      changedPostion = LastPositionChange.NoChange;
 
-    //check long position
-    if (currentTrade === CurrentPosition.Long) {
-      if (currentPortfolioValue >= priceExit) {
-        if (predictedMove < shortEnter) {
-          currentTrade = CurrentPosition.Short;
-          changedPostion = LastPositionChange.EnterShort;
-          priceExit = currentPortfolioValue*(1-shortExit/100);
-        } else {
-          currentTrade = CurrentPosition.Neutral;
-          changedPostion = LastPositionChange.ExitLong;
+      //check long position
+      if (currentTrade === CurrentPosition.Long) {
+        if (currentPortfolioValue >= priceExit) {
+          if (predictedMove < shortEnter) {
+            currentTrade = CurrentPosition.Short;
+            changedPostion = LastPositionChange.EnterShort;
+            priceExit = currentPortfolioValue*(1-shortExit/100);
+          } else {
+            currentTrade = CurrentPosition.Neutral;
+            changedPostion = LastPositionChange.ExitLong;
+          }
         }
-      }
-    } else if (currentTrade === CurrentPosition.Neutral) {
-      if (predictedMove >= longEnter) {
-        currentTrade = CurrentPosition.Long;
-        changedPostion = LastPositionChange.EnterLong;
-        priceExit = currentPortfolioValue*(1+longExit/100);
-      } else if (predictedMove <= shortEnter) {
-        currentTrade = CurrentPosition.Short;
-        changedPostion = LastPositionChange.EnterShort;
-        priceExit = currentPortfolioValue*(1-shortExit/100);
-      }
-    } else {
-      // currently shorting
-      if (predictedMove > shortExit) {
-        if (predictedMove > longEnter) {
+      } else if (currentTrade === CurrentPosition.Neutral) {
+        if (predictedMove >= longEnter) {
           currentTrade = CurrentPosition.Long;
           changedPostion = LastPositionChange.EnterLong;
           priceExit = currentPortfolioValue*(1+longExit/100);
+        } else if (predictedMove <= shortEnter) {
+          currentTrade = CurrentPosition.Short;
+          changedPostion = LastPositionChange.EnterShort;
+          priceExit = currentPortfolioValue*(1-shortExit/100);
+        }
+      } else {
+        // currently shorting
+        if (predictedMove > shortExit) {
+          if (predictedMove > longEnter) {
+            currentTrade = CurrentPosition.Long;
+            changedPostion = LastPositionChange.EnterLong;
+            priceExit = currentPortfolioValue*(1+longExit/100);
 
-        } else {
-          currentTrade = CurrentPosition.Neutral;
-          changedPostion = LastPositionChange.ExitShort;
+          } else {
+            currentTrade = CurrentPosition.Neutral;
+            changedPostion = LastPositionChange.ExitShort;
+          }
         }
       }
+
+      if (currentTrade === CurrentPosition.Long) {
+        currentPortfolioValue *= 1 + data["daily_ret"][i];
+      } else if (currentTrade === CurrentPosition.Short) {
+        currentPortfolioValue *= 1 - data["daily_ret"][i];
+      }
+      returnData[i][j] = currentPortfolioValue;
+      tempChanges.push(changedPostion);
     }
-
-    if (currentTrade === CurrentPosition.Long) {
-      currentPortfolioValue *= 1 + data["daily_ret"][i];
-    } else if (currentTrade === CurrentPosition.Short) {
-      currentPortfolioValue *= 1 - data["daily_ret"][i];
+    trades.push(tempChanges);
+    j++;
+  }
+  // add buy and hold strategy...
+  if(state["Buy and Hold"]) {
+    currentPortfolioValue = 10000;
+    tempChanges = [];
+    for(i=0; i<data.daily_ret.length; i++) {
+      returnData[i][j] = currentPortfolioValue*(1+data.daily_ret[i]);
+      tempChanges[i]=-1;
     }
-    returnData[i][j] = currentPortfolioValue;
-    tempChanges.push(changedPostion);
+    trades.push(tempChanges);
   }
-  trades.push(tempChanges);
-  strategyLabels.push("Random Forest");
-
-  // TODO add buy and hold strategy...
-  strategyLabels.push("Buy and Hold");
-  j++;
-  currentPortfolioValue = 10000;
-  tempChanges = [];
-  for(i=0; i<data.daily_ret.length; i++) {
-    returnData[i][j] = currentPortfolioValue*(1+data.daily_ret[i]);
-    tempChanges[i]=-1;
-  }
-  trades.push(tempChanges);
-  // 
-  var strategyLabelsMap : StringBoolean = {};
-
-  const [state, setState] = useState<StringBoolean>(strategyLabelsMap);
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setState({ ...state, [event.target.name]: event.target.checked });
