@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { ChartUtils } from "../utils/ChartUtils";
 
-const colors = ["#66a61e", "#1b9e77", "#d95f02", "#7570b3", "#e7298a"];
+const colors = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"];
 
 const LineChart = (props: any) => {
   const data: number[][] = props.data;

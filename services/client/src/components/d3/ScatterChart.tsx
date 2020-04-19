@@ -73,7 +73,7 @@ const ScatterChart = (props: any) => {
       yScale,
       width,
       height,
-      (1 - maxX / (maxX - minX)) * width,
+      (1 - ChartUtils.undefinedHandler(d3.min([1,maxX / (maxX - minX)]),0)) * width,
       yAxisShift * height,
       margin.top,
       margin.left

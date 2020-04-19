@@ -9,7 +9,7 @@ const DoubleHorizontalBarChart = (props: any) => {
 
   const canvas = useRef(null);
 
-  const margin = { top: 50, right: 0, bottom: 50, left: 175 };
+  const margin = { top: 50, right: 0, bottom: 50, left: 225 };
   const width = 300;
   const height = 250;
 
