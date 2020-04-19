@@ -112,7 +112,7 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
         <DoubleHorizontalBarChart
           labels={labelStrings.map((val) => IndicatorTextMap[val].label)}
           data={doubleData}
-        ></DoubleHorizontalBarChart>
+        />
         <p style={{ textAlign: "center" }}>
           This plot shows indicators most likely to predict future stock
           direction
@@ -147,21 +147,20 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
             <FormGroup>{checkboxes}</FormGroup>
           </FormControl>
         </CardContent>
-        
       </Card>
     </Grid>
   );
 
   final.push(
-    SliderCard(
-      handleChange,
-      "Enter prediction term",
-      "Select term to compare gain vs indicator",
-      1,
-      data.dates.length - 5,
-      1,
-      []
-    )
+    <SliderCard
+      onChange={handleChange}
+      title={"Enter prediction term"}
+      description={"Select term to compare gain vs indicator"}
+      minVal={1}
+      maxVal={data.dates.length - 5}
+      defaultValue={1}
+      labels={[]}
+    />
   );
 
   /*** Scatter Plots ****************** */
@@ -184,7 +183,7 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
             <ScatterChart
               data={scatterData}
               label={IndicatorTextMap[key].label}
-            ></ScatterChart>
+            />
           </Card>
           <p style={{ textAlign: "center" }}>
             {IndicatorTextMap[key].description}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
-import { SampleData2 } from "../../data/sample2";
 import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
 import {
   MuiPickersUtilsProvider,
@@ -13,6 +12,8 @@ import { FormatDate } from "../utils/FormatDate";
 import { IndicatorsLayout } from "./Indicators";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+// const API_ENDPOINT =
+//   "http://dvateam128.webfactional.com/api/api/analysis/example";
 const API_ENDPOINT = "/api/analysis/example";
 
 const IndicatorsPage = () => {
@@ -25,7 +26,7 @@ const IndicatorsPage = () => {
   const [data, setData] = useState<StockAnalysis>();
 
   const httpClient = axios.create();
-  httpClient.defaults.timeout = 20000;
+  // httpClient.defaults.timeout = 20000;
 
   const getData = async () => {
     setLoading(true);

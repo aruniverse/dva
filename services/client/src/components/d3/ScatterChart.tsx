@@ -2,9 +2,12 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { ChartUtils } from "../utils/ChartUtils";
 
-const ScatterChart = (props: any) => {
-  const data: number[][] = props.data;
-  const label: string = props.label;
+interface ScatterChartProps {
+  data: number[][];
+  label: string;
+}
+
+const ScatterChart = ({ data, label }: ScatterChartProps) => {
   const canvas = useRef(null);
   const margin = { top: 50, right: 100, bottom: 50, left: 100 };
   const width = 500;
@@ -32,13 +35,13 @@ const ScatterChart = (props: any) => {
   const xScale = d3.scaleLinear().range([0, width]).domain([minX, maxX]);
   const yScale = d3.scaleLinear().range([height, 0]).domain([minY, maxY]);
 
-  function addXYScatter(
+  const addXYScatter = (
     svg: d3.Selection<null, unknown, null, undefined>,
     xScale: any,
     yScale: any,
     color: string,
     radius: number
-  ) {
+  ) => {
     svg
       .selectAll("circle")
       .data(data)
@@ -52,9 +55,9 @@ const ScatterChart = (props: any) => {
       })
       .attr("r", radius)
       .style("fill", color);
-  }
+  };
 
-  const drawScatterChart = (title: string, xScale: any, yScale: any) => {
+  const drawScatterChart = (label: string, xScale: any, yScale: any) => {
     const g = d3.select(canvas.current);
     g.selectAll("*").remove();
 
@@ -73,7 +76,8 @@ const ScatterChart = (props: any) => {
       yScale,
       width,
       height,
-      (1 - ChartUtils.undefinedHandler(d3.min([1,maxX / (maxX - minX)]),0)) * width,
+      (1 - ChartUtils.undefinedHandler(d3.min([1, maxX / (maxX - minX)]), 0)) *
+        width,
       yAxisShift * height,
       margin.top,
       margin.left

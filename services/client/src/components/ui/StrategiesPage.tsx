@@ -12,6 +12,8 @@ import StrategiesLayout from "./Strategies";
 import { FormatDate } from "../utils/FormatDate";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+// const API_ENDPOINT =
+//   "http://dvateam128.webfactional.com/api/api/analysis/example";
 const API_ENDPOINT = "/api/analysis/example";
 
 const StrategiesPage = () => {
@@ -24,7 +26,7 @@ const StrategiesPage = () => {
   const [data, setData] = useState<StockAnalysis>();
 
   const httpClient = axios.create();
-  httpClient.defaults.timeout = 20000;
+  // httpClient.defaults.timeout = 20000;
 
   const getData = async () => {
     setLoading(true);

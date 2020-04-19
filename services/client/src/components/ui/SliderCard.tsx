@@ -5,15 +5,25 @@ import CardContent from "@material-ui/core/CardContent";
 import Slider from "@material-ui/core/Slider";
 import Typography from "@material-ui/core/Typography";
 
-const SliderCard = (
-  onChange: (event: any, value: number | number[]) => void,
-  title: string,
-  description: string,
-  minVal: number,
-  maxVal: number,
-  defaultValue: number,
-  labels: number[]
-) => {
+interface SliderCardProps {
+  onChange: (event: any, value: number | number[]) => void;
+  title: string;
+  description: string;
+  minVal: number;
+  maxVal: number;
+  defaultValue: number;
+  labels: number[];
+}
+
+const SliderCard = ({
+  onChange,
+  title,
+  description,
+  minVal,
+  maxVal,
+  defaultValue,
+  labels,
+}: SliderCardProps) => {
   var marks = [];
   for (var i = 0; i < labels.length; i++) {
     marks.push({ value: i, label: String(labels[i] + "%") });

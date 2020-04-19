@@ -2,11 +2,16 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { ChartUtils } from "../utils/ChartUtils";
 
-const DoubleHorizontalBarChart = (props: any) => {
-  const labels: any[] = props.labels;
-  const titles: any[] = ["Pearson Coefficient", "Importance Values"];
-  const data: number[][] = props.data;
+interface DoubleHorizontalBarChartProps {
+  labels: string[];
+  data: number[][];
+}
 
+const DoubleHorizontalBarChart = ({
+  labels,
+  data,
+}: DoubleHorizontalBarChartProps) => {
+  const titles: string[] = ["Pearson Coefficient", "Importance Values"];
   const canvas = useRef(null);
 
   const margin = { top: 50, right: 0, bottom: 50, left: 225 };

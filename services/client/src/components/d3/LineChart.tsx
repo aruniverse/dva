@@ -4,12 +4,15 @@ import { ChartUtils } from "../utils/ChartUtils";
 
 const colors = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"];
 
-const LineChart = (props: any) => {
-  const data: number[][] = props.data;
-  const dates = props.dates;
-  const trades = props.trades;
-  const title = props.title;
-  const labels: string[] = props.labels;
+interface LineChartProps {
+  data: number[][];
+  dates: Date[];
+  trades: number[][];
+  labels: string[];
+  title: string;
+}
+
+const LineChart = ({ data, dates, trades, labels, title }: LineChartProps) => {
   const canvas = useRef(null);
 
   const margin = { top: 50, right: 100, bottom: 50, left: 100 };
@@ -56,13 +59,13 @@ const LineChart = (props: any) => {
       .attr("d", line2);
   };
 
-  function addChartSymbol(
+  const addChartSymbol = (
     svg: d3.Selection<null, unknown, null, undefined>,
     dataset: [any, number][],
     symbolClass: string,
     hasNoFill: boolean,
     color: string
-  ) {
+  ) => {
     svg
       .selectAll(symbolClass)
       .data(dataset)
@@ -88,7 +91,7 @@ const LineChart = (props: any) => {
         .attr("cy", (d) => yScale(d[1]))
         .style("fill", "white");
     }
-  }
+  };
 
   const drawLineChart = () => {
     const g = d3.select(canvas.current);
@@ -163,7 +166,6 @@ const LineChart = (props: any) => {
 
   //https://medium.com/stationfive/how-to-create-a-pie-chart-with-d3-js-and-react-hooks-part-1-81bcd7f39b32
   return (
-    //<div ref={canvas}></div>
     <svg
       width={width + margin.left + margin.right}
       height={height + margin.top + margin.bottom}

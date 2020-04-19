@@ -48,7 +48,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
     "Random Forest",
     "Buy and Hold",
   ];
-  var legendLabels : string[] = [];
+  var legendLabels: string[] = [];
   var trades: number[][] = [];
   var k = 0;
 
@@ -194,16 +194,16 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   const enterShort = (i: number) => {
     changedPostion = LastPositionChange.EnterShort;
     priceExit = currentPortfolioValue * (1 - shortExit / 100);
-    console.log("entered short", data.dates[i], "term: " + predictedMove)
+    console.log("entered short", data.dates[i], "term: " + predictedMove);
     return CurrentPosition.Short;
-  }
+  };
 
   const enterLong = (i: number) => {
     changedPostion = LastPositionChange.EnterLong;
     priceExit = currentPortfolioValue * (1 + longExit / 100);
     console.log("entered long", data.dates[i], "term: " + predictedMove);
     return CurrentPosition.Long;
-  }
+  };
 
   if (state["Random Forest"]) {
     legendLabels.push("Random Forest");
@@ -232,9 +232,10 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
         } else if (predictedMove <= shortEnter) {
           currentTrade = enterShort(i);
         }
-      } else {         // currently shorting
+      } else {
+        // currently shorting
         if (currentPortfolioValue > priceExit) {
-          console.log("exit short", data.dates[i], "term: " + predictedMove)
+          console.log("exit short", data.dates[i], "term: " + predictedMove);
           if (predictedMove >= longEnter) {
             currentTrade = enterLong(i);
           } else {
@@ -260,7 +261,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
     currentPortfolioValue = 10000;
     tempChanges = [];
     for (i = 0; i < data.daily_ret.length; i++) {
-      currentPortfolioValue *= (1 + data.daily_ret[i])
+      currentPortfolioValue *= 1 + data.daily_ret[i];
       returnData[i][j] = currentPortfolioValue;
       tempChanges[i] = -1;
     }
@@ -310,7 +311,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
           trades={trades}
           labels={legendLabels}
           title={"Strategy Returns for Initial Value $" + startPrice}
-        ></LineChart>
+        />
       </Card>
     </Grid>
   );
@@ -439,15 +440,15 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   );
 
   final.push(
-    SliderCard(
-      handleRSIShort,
-      "RSI",
-      "Select RSI value to go long/short",
-      1,
-      99,
-      50,
-      []
-    )
+    <SliderCard
+      onChange={handleRSIShort}
+      title={"RSI"}
+      description={"Select RSI value to go long/short"}
+      minVal={1}
+      maxVal={99}
+      defaultValue={50}
+      labels={[]}
+    />
   );
 
   return (
