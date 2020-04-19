@@ -62,9 +62,10 @@ class price_analysis:
             self.df_data['Date']=pd.to_datetime(self.df_data['Date'])   #Convert date to datetime
 
         elif data_file.endswith('.json'):
-            self.df_data=pd.read_json('data.json')
-            self.df_data.rename(inplace=True, columns={'open':'Open','high':'High','close':'Close','volume':'Volume','datetime':'Date'})
-            self.df_data['Low']=self.df_data['Close']-random.random()*10  #Temporary placeholder for low
+            self.df_data=pd.read_json(args.data_file)
+            self.df_data.rename(inplace=True, columns={'open':'Open','high':'High', 'low':'Low','close':'Close','volume':'Volume','datetime':'Date'})
+            #self.df_data['Low']=self.df_data['Close']-random.random()*10  #Temporary placeholder for low
+            if verbose: print ('dataframe:',self.df_data) 
 
         else:
             print ('Invalid file extension on input file')
@@ -111,6 +112,7 @@ class price_analysis:
     def calc_daily_return(self, dataframe, series):
         
         dataframe['Daily_return']=(dataframe[series]-dataframe[series].shift(1))/dataframe[series].shift(1)
+        dataframe.loc[:self.start_index, 'Daily_return']=0    #clear daily return to index start (to fix issue with cum sum)
         dataframe['Cum_return']=dataframe['Daily_return'].cumsum()
         dataframe.dropna(inplace=True)
 
@@ -182,7 +184,7 @@ class price_analysis:
             period_rsi=self.parameters['indicator']['rel_strength']['parameters']['period']
             self.df_anal['rel_strength']=ta.momentum.rsi(self.df_data['Close'], period_rsi)
 
-        self.results['predict']['indicator_list']=self.indicator_list
+        self.results['indicator_list']=self.indicator_list
         self.random_forest_analysis()
         self.f_test_analysis()
         
@@ -221,7 +223,7 @@ class price_analysis:
             y_data=self.df_anal.loc[:,'term_'+str(term)]  #start at reference index
 
             x_train, x_test, y_train, y_test=train_test_split(x_data, y_data, test_size=0.25)
-            clf = RandomForestClassifier(n_estimators=6)
+            clf = RandomForestClassifier(n_estimators=100)
             clf.fit(x_train, np.ravel(y_train))
 
             y_pred_train_rf=clf.predict(x_train)
@@ -250,7 +252,7 @@ class price_analysis:
             
     def f_test_analysis(self):
         self.df_anal.dropna(inplace=True)
-        self.results['f_regression']['indicator_list']=self.indicator_list
+        #self.results['f_regression']['indicator_list']=self.indicator_list
         
         for term in self.parameters['term']:
             x_data=self.df_anal.loc[:,self.indicator_list]
