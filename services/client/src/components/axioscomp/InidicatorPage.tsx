@@ -1,50 +1,63 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
-import axios from "axios";
-import { StockSymbol } from "../../types";
-import { Button, CircularProgress, Grid, Input } from "@material-ui/core";
+import { StockAnalysis } from "../../types";
+import { SampleData2 } from "../../data/sample2";
+import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
 import {
-  KeyboardDatePicker,
   MuiPickersUtilsProvider,
+  KeyboardDatePicker,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
+import axios from "axios";
+import { FormatDate } from "../utils/FormatDate";
+import { IndicatorsLayout } from "../ui/Indicators";
 
-const Test = () => {
+const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+// const API_ENDPOINT = "/api/analysis";
+
+const IndicatorsPage = () => {
   const [loading, setLoading] = useState(false);
   const [ticker, setTicker] = useState("");
   const [endDate, setEndDate] = useState<Date | null>(new Date()); // today
   const tempDate = new Date();
   tempDate?.setMonth(tempDate.getMonth() - 3);
   const [startDate, setStartDate] = useState<Date | null>(tempDate); // 3 months ago
+  const [data, setData] = useState<StockAnalysis>();
 
-  const [data, setData] = useState<StockSymbol>();
-
-  // useEffect(() => {
-  //   getData();
-  // }, []);
+  const httpClient = axios.create();
+  httpClient.defaults.timeout = 20000;
 
   const getData = async () => {
     setLoading(true);
-    const response = await axios.get("/api/symbol", {
-      params: {
-        ticker: ticker,
-        start_date: startDate?.toISOString(),
-        end_date: endDate?.toISOString(),
-      },
-    });
-    const { status, statusText, data } = response;
-    console.log(response);
-    if (status == 200) {
-      setData(data);
-      setLoading(false);
-    } else {
-      console.log(status, statusText);
-      throw new Error(statusText);
-    }
+    // const response = await httpClient.get(API_ENDPOINT, {
+    //   params: {
+    //     symbol: ticker,
+    //     start_date: FormatDate(startDate),
+    //     end_date: FormatDate(endDate),
+    //   },
+    // });
+    // const { status, statusText, data } = response;
+    // console.log(response);
+    // if (status == 200) {
+    //   setData(data);
+    //   setLoading(false);
+    // } else {
+    //   setLoading(false);
+    //   console.log(status, statusText);
+    //   //   throw new Error(statusText);
+    // }
+    setData(SampleData2);
+    setLoading(false);
   };
 
   return (
     <div>
+      <h1>Indicators</h1>
+      <p>
+        This page is used to determine which indicators are useful in a model to
+        predict stock direction. Please enter the Stock Ticker, the Start Date,
+        End Date and then run!
+      </p>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Grid container justify="space-around">
           <Input
@@ -81,26 +94,17 @@ const Test = () => {
             style={{ justifySelf: "left" }}
             onClick={() => getData()}
           >
-            Default
+            Run
           </Button>
         </Grid>
       </MuiPickersUtilsProvider>
       {loading ? (
         <CircularProgress style={{ alignContent: "center", height: "40px" }} />
       ) : (
-        <>
-          <h1 style={{ textAlign: "center" }}>{data?.symbol[0]}</h1>
-          {data?.high.map((val, i) => {
-            return (
-              <h2 key={i} style={{ textAlign: "center" }}>
-                {val}
-              </h2>
-            );
-          })}
-        </>
+        data && <IndicatorsLayout data={data} />
       )}
     </div>
   );
 };
 
-export default withMainContainer(Test);
+export default withMainContainer(IndicatorsPage);

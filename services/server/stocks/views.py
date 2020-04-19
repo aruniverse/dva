@@ -1,4 +1,5 @@
 # Python
+import os.path
 import json
 import datetime
 # Django
@@ -66,5 +67,24 @@ def symbol_detail(request, pk):
             json.dumps(_dict),
             content_type='application/javascript; charset=utf8'
         )
+
+    return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+def example(request):
+    """
+    Returns an example of what the frontend expects to generate the visualizations.
+    """
+    if request.method == 'GET':
+        fp = os.path.abspath(os.path.dirname(
+            os.path.abspath(__file__))) + "/analysis/output_17Apr.json"
+        with open(fp, 'r') as f:
+            data = json.load(f)
+
+            return HttpResponse(
+                json.dumps(data),
+                content_type='application/javascript; charset=utf8'
+            )
 
     return JsonResponse(serializer.errors, status=400)

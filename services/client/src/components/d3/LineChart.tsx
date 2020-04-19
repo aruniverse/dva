@@ -104,12 +104,12 @@ const LineChart = (props: any) => {
     addChartSymbol(g, exitShort, "enterLong", true, "red");
 
     var legendData = []; 
-    for(var i=0; i<labels.length; i++) {
+    for(i=0; i<labels.length; i++) {
       legendData.push({color:colors[i%colors.length], name:labels[i], isLine:true});
     }
     legendData.push({color:"red", name:"Enter Short", hollow:false});
     legendData.push({color:"red", name:"Exit Short", hollow:true});
-    legendData.push({color:"green", name:"Enter Short"});
+    legendData.push({color:"green", name:"Enter Long"});
     legendData.push({color:"green", name:"Exit Long", hollow:true});
 
     ChartUtils.createLegend(g, legendData, width, height);

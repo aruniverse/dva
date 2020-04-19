@@ -8,14 +8,14 @@ const history = createBrowserHistory();
 
 const App = () => {
   return (
-    <div>
+    <>
       <Helmet>
         <title>{"Team TBD"}</title>
       </Helmet>
       <Router history={history}>
         <Routes />
       </Router>
-    </div>
+    </>
   );
 };
 
