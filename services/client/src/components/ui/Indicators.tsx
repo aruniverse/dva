@@ -1,12 +1,7 @@
 import ScatterChart from "../d3/ScatterChart";
-import LineChart from "../d3/LineChart";
 import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Select from "@material-ui/core/Select";
-import Slider from "@material-ui/core/Slider";
-import Typography from "@material-ui/core/Typography";
 import DoubleHorizontalBarChart from "../d3/DoubleHorizontalBarChart";
 import SliderCard from "../ui/SliderCard";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -74,6 +69,10 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
           labels={labelStrings}
           data={doubleData}
         ></DoubleHorizontalBarChart>
+        <p style={{ textAlign: "center" }}>
+          This plot shows indicators most likely to predict future stock
+          direction
+        </p>
       </Card>
     </Grid>
   );

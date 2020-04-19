@@ -49,7 +49,7 @@ const IndicatorsPage = () => {
   };
 
   return (
-    <div>
+    <div className="IndicatorPage">
       <h1>Indicators</h1>
       <p>
         This page is used to determine which indicators are useful in a model to
@@ -89,8 +89,8 @@ const IndicatorsPage = () => {
           />
           <Button
             variant="contained"
-            style={{ justifySelf: "left" }}
             onClick={() => getData()}
+            disabled={!ticker}
           >
             Run
           </Button>

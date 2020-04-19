@@ -12,7 +12,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import SliderCard from "../ui/SliderCard";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
-import { SampleData2 } from "../../data/sample2";
 
 export enum CurrentPosition {
   Short = 1,
@@ -432,7 +431,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   );
 
   return (
-    <div>
+    <div className="StartegiesLayout">
       <Grid container spacing={1}>
         {final}
       </Grid>

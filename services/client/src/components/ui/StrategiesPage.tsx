@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
-import { SampleData2 } from "../../data/sample2";
 import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
 import {
   MuiPickersUtilsProvider,
@@ -49,7 +48,7 @@ const StrategiesPage = () => {
   };
 
   return (
-    <div>
+    <div className="StrategiesPage">
       <h1>Strategies</h1>
       <p>
         This page is used to determine which strategies are useful in a model to
@@ -91,6 +90,7 @@ const StrategiesPage = () => {
             variant="contained"
             style={{ justifySelf: "left" }}
             onClick={() => getData()}
+            disabled={!ticker}
           >
             Run
           </Button>

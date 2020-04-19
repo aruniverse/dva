@@ -1820,15 +1820,14 @@ export const SampleData1: StockAnalysis = {
       54.51215601119449,
     ],
   },
-  indicator_list: ["acc_dist_index", "chaikin_money_flow", "ease_of_move", "williams_r", "rel_strength"], 
+  indicator_list: [
+    "acc_dist_index",
+    "chaikin_money_flow",
+    "ease_of_move",
+    "williams_r",
+    "rel_strength",
+  ],
   predict: {
-    /*  indicator_list: [
-      "acc_dist_index",
-      "chaikin_money_flow",
-      "ease_of_move",
-      "williams_r",
-      "rel_strength",
-    ],*/
     term_5: {
       train_score: 0.9606299212598425,
       test_score: 0.46511627906976744,
@@ -2383,14 +2382,6 @@ export const SampleData1: StockAnalysis = {
     },
   },
   f_regression: {
-    /*  indicator_list: [
-      "acc_dist_index",
-      "chaikin_money_flow",
-      "ease_of_move",
-      "williams_r",
-      "rel_strength",
-    ],
-  */
     term_5: {
       p_values: [
         0.48428953717792134,

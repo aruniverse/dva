@@ -11,7 +11,7 @@ const Sidebar = () => {
     <Drawer open variant="permanent" anchor="left" className="Sidebar">
       <List>
         {PageTabName.map((text) => (
-          <NavLink to={text}>
+          <NavLink to={text.toLowerCase()}>
             <ListItem button key={text}>
               <ListItemText primary={text} />
             </ListItem>
