@@ -364,7 +364,7 @@ const StrategiesLayout = () => {
                     <b>{"Enter Short"}:</b>
                 </Typography>
                 <p>
-                    {"Select cutoff percentage where strategy exits short position"}
+                    {"Select cutoff percentage where strategy enters short position"}
                 </p>
                 <Slider
                     name={"enterShort"}
