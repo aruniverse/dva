@@ -37,7 +37,6 @@ interface StrategiesLayoutProps {
 }
 
 const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
-  data = SampleData2;
   var keyPlot = 1098;
   const startPrice = 10000;
   var j = 0;
