@@ -5,5 +5,5 @@ from stocks import views
 urlpatterns = [
     path('api/symbol/', views.symbol_list),
     path('api/symbol/<int:pk>/', views.symbol_detail),
-    path('api/symbol/example', views.example),
+    path('api/analysis/example', views.example),
 ]

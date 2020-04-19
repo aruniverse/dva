@@ -12,8 +12,8 @@ import axios from "axios";
 import StrategiesLayout from "../ui/Strategies";
 import { FormatDate } from "../utils/FormatDate";
 
-const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
-// const API_ENDPOINT = "/api/analysis";
+// const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+const API_ENDPOINT = "/api/analysis/example";
 
 const StrategiesPage = () => {
   const [loading, setLoading] = useState(false);
@@ -29,32 +29,30 @@ const StrategiesPage = () => {
 
   const getData = async () => {
     setLoading(true);
-    // const response = await httpClient.get(API_ENDPOINT, {
-    //   params: {
-    //     symbol: ticker,
-    //     start_date: FormatDate(startDate),
-    //     end_date: FormatDate(endDate),
-    //   },
-    // });
-    // const { status, statusText, data } = response;
-    // console.log(response);
-    // if (status == 200) {
-    //   setData(data);
-    //   setLoading(false);
-    // } else {
-    //   setLoading(false);
-    //   console.log(status, statusText);
-    //   //   throw new Error(statusText);
-    // }
-    setData(SampleData2);
-    setLoading(false);
+    const response = await httpClient.get(API_ENDPOINT, {
+      params: {
+        symbol: ticker,
+        start_date: FormatDate(startDate),
+        end_date: FormatDate(endDate),
+      },
+    });
+    const { status, statusText, data } = response;
+    console.log(response);
+    if (status == 200) {
+      setData(data);
+      setLoading(false);
+    } else {
+      setLoading(false);
+      console.log(status, statusText);
+      throw new Error(statusText);
+    }
   };
 
   return (
     <div>
-      <h1>Indicators</h1>
+      <h1>Strategies</h1>
       <p>
-        This page is used to determine which indicators are useful in a model to
+        This page is used to determine which strategies are useful in a model to
         predict stock direction. Please enter the Stock Ticker, the Start Date,
         End Date and then run!
       </p>
