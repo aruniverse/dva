@@ -2,6 +2,7 @@ import ScatterChart from "../d3/ScatterChart";
 import React, { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import DoubleHorizontalBarChart from "../d3/DoubleHorizontalBarChart";
 import SliderCard from "../ui/SliderCard";
 import FormLabel from "@material-ui/core/FormLabel";
@@ -140,10 +141,13 @@ export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   final.push(
     <Grid item lg={2}>
       <Card variant="outlined">
-        <FormControl component="fieldset">
-          <FormLabel component="legend">Select Indicators</FormLabel>
-          <FormGroup>{checkboxes}</FormGroup>
-        </FormControl>
+        <CardContent>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Select Indicators</FormLabel>
+            <FormGroup>{checkboxes}</FormGroup>
+          </FormControl>
+        </CardContent>
+        
       </Card>
     </Grid>
   );

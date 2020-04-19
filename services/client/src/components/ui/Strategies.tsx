@@ -48,6 +48,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
     "Random Forest",
     "Buy and Hold",
   ];
+  var legendLabels : string[] = [];
   var trades: number[][] = [];
   var k = 0;
 
@@ -65,7 +66,6 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
 
   var strategyLabelsMap: StringBoolean = {};
 
-  //
   for (i = 0; i < strategyLabels.length; i++) {
     strategyLabelsMap[strategyLabels[i]] = true;
   }
@@ -145,6 +145,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
       trades[j] = data.dates.map((d) =>
         d === value["actions"][k][0] ? getType(value["actions"][k++]) : -1
       );
+      legendLabels.push(key);
       j++;
     }
   });
@@ -179,7 +180,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
     }
 
     trades.push(tempChanges);
-    //strategyLabels.push("RSI at " + rsiFlip);
+    legendLabels.push("RSI at " + rsiFlip);
     j++;
   }
 
@@ -205,6 +206,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   }
 
   if (state["Random Forest"]) {
+    legendLabels.push("Random Forest");
     for (
       i = 0;
       i < data.predict["term_" + predictionTerm].predict.length;
@@ -263,6 +265,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
       tempChanges[i] = -1;
     }
     trades.push(tempChanges);
+    legendLabels.push("Buy and Hold");
     j++;
   }
 
@@ -305,8 +308,8 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
           data={returnData}
           dates={dates}
           trades={trades}
-          labels={strategyLabels}
-          title="Return"
+          labels={legendLabels}
+          title={"Strategy Returns for Initial Value $" + startPrice}
         ></LineChart>
       </Card>
     </Grid>
