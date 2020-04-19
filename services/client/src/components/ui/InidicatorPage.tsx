@@ -10,7 +10,7 @@ import {
 import DateFnsUtils from "@date-io/date-fns";
 import axios from "axios";
 import { FormatDate } from "../utils/FormatDate";
-import { IndicatorsLayout } from "../ui/Indicators";
+import { IndicatorsLayout } from "./Indicators";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
 const API_ENDPOINT = "/api/analysis/example";

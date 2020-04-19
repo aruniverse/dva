@@ -2,8 +2,8 @@ import * as React from "react";
 import { Route, Switch } from "react-router-dom";
 import Page404 from "./components/error/Page404";
 import Home from "./components/home/Home";
-import InidicatorPage from "./components/axioscomp/InidicatorPage";
-import StrategiesPage from "./components/axioscomp/StrategiesPage";
+import InidicatorPage from "./components/ui/InidicatorPage";
+import StrategiesPage from "./components/ui/StrategiesPage";
 
 const Routes = (): JSX.Element => {
   return (
