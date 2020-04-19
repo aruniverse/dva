@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from stocks import views
 
 urlpatterns = [
     path('api/symbol/', views.symbol_list),
-    path('api/symbol/<int:pk>/', views.symbol_detail),
+    re_path(r'analysis$', views.symbol_detail),
     path('api/analysis/example', views.example),
 ]

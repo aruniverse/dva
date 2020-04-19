@@ -9,7 +9,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import axios from "axios";
-import StrategiesLayout from "../ui/Strategies";
+import StrategiesLayout from "./Strategies";
 import { FormatDate } from "../utils/FormatDate";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
