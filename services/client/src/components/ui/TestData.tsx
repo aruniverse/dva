@@ -4,7 +4,7 @@ import IndicatorsLayout from "./Indicators";
 import { SampleData2 } from "../../data/sample2";
 
 const TestData = () => {
-  return IndicatorsLayout(SampleData2);
+  return <IndicatorsLayout data={SampleData2} />;
 };
 
 export default TestData;

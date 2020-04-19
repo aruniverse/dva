@@ -12,10 +12,10 @@ import axios from "axios";
 import { FormatDate } from "../utils/FormatDate";
 import { IndicatorsLayout } from "../ui/Indicators";
 
-// const API_ENDPOINT = "http://dvateam128.webfactional.com/api"
-const API_ENDPOINT = "/api";
+const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+// const API_ENDPOINT = "/api/analysis";
 
-const IndicatorsPage = (props: StockAnalysis) => {
+const IndicatorsPage = () => {
   const [loading, setLoading] = useState(false);
   const [ticker, setTicker] = useState("");
   const [endDate, setEndDate] = useState<Date | null>(new Date()); // today

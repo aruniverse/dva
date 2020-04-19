@@ -7,11 +7,11 @@ import "./Sidebar.scss";
 const Sidebar = () => {
   const PageTabName = [
     "Home",
-    "Form",
+    // "Form",
     "Indicators",
     "Strategies",
-    "Charts",
-    "Old",
+    // "Charts",
+    // "Old",
   ];
 
   return (

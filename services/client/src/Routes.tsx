@@ -13,11 +13,10 @@ const Routes = (): JSX.Element => {
     <Switch>
       <Route exact path="/" component={Home} />
       <Route exact path="/home" component={Home} />
-      <Route exact path="/old" component={OldApp} />
-      <Route exact path="/form" component={Test} />
+      {/* <Route exact path="/old" component={OldApp} /> */}
+      {/* <Route exact path="/form" component={Test} /> */}
       {/* <Route exact path="/charts" component={LoadChart} /> */}
-      <Route exact path="/charts" component={InidicatorPage} />
-      <Route exact path="/indicators" component={TestData} />
+      <Route exact path="/indicators" component={InidicatorPage} />
       <Route exact path="/strategies" component={TestData} />
       <Route component={Page404} />
     </Switch>
