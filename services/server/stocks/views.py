@@ -78,7 +78,7 @@ def example(request):
     """
     if request.method == 'GET':
         fp = os.path.abspath(os.path.dirname(
-            os.path.abspath(__file__))) + "/analysis/output_17Apr.json"
+            os.path.abspath(__file__))) + "/analysis/output_18Apr.json"
         with open(fp, 'r') as f:
             data = json.load(f)
 

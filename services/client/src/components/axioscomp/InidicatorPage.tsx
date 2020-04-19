@@ -12,8 +12,8 @@ import axios from "axios";
 import { FormatDate } from "../utils/FormatDate";
 import { IndicatorsLayout } from "../ui/Indicators";
 
-const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
-// const API_ENDPOINT = "/api/analysis";
+// const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
+const API_ENDPOINT = "/api/analysis/example";
 
 const IndicatorsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -29,25 +29,23 @@ const IndicatorsPage = () => {
 
   const getData = async () => {
     setLoading(true);
-    // const response = await httpClient.get(API_ENDPOINT, {
-    //   params: {
-    //     symbol: ticker,
-    //     start_date: FormatDate(startDate),
-    //     end_date: FormatDate(endDate),
-    //   },
-    // });
-    // const { status, statusText, data } = response;
-    // console.log(response);
-    // if (status == 200) {
-    //   setData(data);
-    //   setLoading(false);
-    // } else {
-    //   setLoading(false);
-    //   console.log(status, statusText);
-    //   //   throw new Error(statusText);
-    // }
-    setData(SampleData2);
-    setLoading(false);
+    const response = await httpClient.get(API_ENDPOINT, {
+      params: {
+        symbol: ticker,
+        start_date: FormatDate(startDate),
+        end_date: FormatDate(endDate),
+      },
+    });
+    const { status, statusText, data } = response;
+    console.log(response);
+    if (status == 200) {
+      setData(data);
+      setLoading(false);
+    } else {
+      setLoading(false);
+      console.log(status, statusText);
+      throw new Error(statusText);
+    }
   };
 
   return (
