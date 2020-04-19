@@ -11,7 +11,7 @@
 <body>
 
 <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
-<script type="text/javascript" src="https://d3js.org/d3-simple-slider.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/d3-simple-slider"></script>
 
 <div class="container">
 	<h2>Term:</h2>
@@ -46,9 +46,6 @@
 	</div>
 </div>
 
-<div id+"plot"></div>
-
-
 <script>
 
 var d= new Object()
@@ -81,7 +78,7 @@ var svg = d3.select("body").append("svg")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("output_17Apr.json").then(function(data){
+d3.json("output_18Apr.json").then(function(data){
 	console.log(data);
 	console.log('Number of buckets:', data.move.length);
 	num_buckets=data['move'].length;

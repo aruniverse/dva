@@ -37,6 +37,7 @@ interface StrategiesLayoutProps {
 }
 
 const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
+  data = SampleData2;
   var keyPlot = 1098;
   const startPrice = 10000;
   var j = 0;
@@ -53,12 +54,17 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   var k = 0;
 
   var final: JSX.Element[] = [];
-  const [predictionTerm, updateTerm] = useState(5);
-  const [longEnter, setLongEnter] = useState(4);
-  const [longExit, setLongExit] = useState(3);
-  const [shortEnter, setShortEnter] = useState(1);
-  const [shortExit, setShortExit] = useState(2);
+  const initEnterLong = 4;
+  const initExitLong = 2;
+  const initEnterShort = 2;
+  const initExitShort = -2;
+  const [predictionTerm, updateTerm] = useState(data.term[0]);
+  const [longEnter, setLongEnter] = useState(initEnterLong);
+  const [longExit, setLongExit] = useState(initExitLong);
+  const [shortEnter, setShortEnter] = useState(initEnterShort);
+  const [shortExit, setShortExit] = useState(initExitShort);
   const [rsiFlip, setrsiFlip] = useState(50);
+
   var strategyLabelsMap: StringBoolean = {};
 
   //
@@ -81,6 +87,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
 
   const handleExitLong = (event: any, value: number | number[]) => {
     if (typeof value == "number") {
+      console.log("long exit", value);
       setLongExit(value);
     }
   };
@@ -185,6 +192,20 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   currentPortfolioValue = 10000;
   tempChanges = [];
 
+  const enterShort = (i: number) => {
+    changedPostion = LastPositionChange.EnterShort;
+    priceExit = currentPortfolioValue * (1 - shortExit / 100);
+    console.log("entered short", data.dates[i], "term: " + predictedMove)
+    return CurrentPosition.Short;
+  }
+
+  const enterLong = (i: number) => {
+    changedPostion = LastPositionChange.EnterLong;
+    priceExit = currentPortfolioValue * (1 + longExit / 100);
+    console.log("entered long", data.dates[i], "term: " + predictedMove);
+    return CurrentPosition.Long;
+  }
+
   if (state["Random Forest"]) {
     for (
       i = 0;
@@ -197,10 +218,9 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
       //check long position
       if (currentTrade === CurrentPosition.Long) {
         if (currentPortfolioValue >= priceExit) {
-          if (predictedMove < shortEnter) {
-            currentTrade = CurrentPosition.Short;
-            changedPostion = LastPositionChange.EnterShort;
-            priceExit = currentPortfolioValue * (1 - shortExit / 100);
+          console.log("exit long", data.dates[i], "term: " + predictedMove);
+          if (predictedMove <= shortEnter) {
+            currentTrade = enterShort(i);
           } else {
             currentTrade = CurrentPosition.Neutral;
             changedPostion = LastPositionChange.ExitLong;
@@ -208,21 +228,15 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
         }
       } else if (currentTrade === CurrentPosition.Neutral) {
         if (predictedMove >= longEnter) {
-          currentTrade = CurrentPosition.Long;
-          changedPostion = LastPositionChange.EnterLong;
-          priceExit = currentPortfolioValue * (1 + longExit / 100);
+          currentTrade = enterLong(i);
         } else if (predictedMove <= shortEnter) {
-          currentTrade = CurrentPosition.Short;
-          changedPostion = LastPositionChange.EnterShort;
-          priceExit = currentPortfolioValue * (1 - shortExit / 100);
+          currentTrade = enterShort(i);
         }
-      } else {
-        // currently shorting
-        if (predictedMove > shortExit) {
-          if (predictedMove > longEnter) {
-            currentTrade = CurrentPosition.Long;
-            changedPostion = LastPositionChange.EnterLong;
-            priceExit = currentPortfolioValue * (1 + longExit / 100);
+      } else {         // currently shorting
+        if (currentPortfolioValue > priceExit) {
+          console.log("exit short", data.dates[i], "term: " + predictedMove)
+          if (predictedMove >= longEnter) {
+            currentTrade = enterLong(i);
           } else {
             currentTrade = CurrentPosition.Neutral;
             changedPostion = LastPositionChange.ExitShort;
@@ -246,10 +260,12 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
     currentPortfolioValue = 10000;
     tempChanges = [];
     for (i = 0; i < data.daily_ret.length; i++) {
-      returnData[i][j] = currentPortfolioValue * (1 + data.daily_ret[i]);
+      currentPortfolioValue *= (1 + data.daily_ret[i])
+      returnData[i][j] = currentPortfolioValue;
       tempChanges[i] = -1;
     }
     trades.push(tempChanges);
+    j++;
   }
 
   const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -301,8 +317,10 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
   // strategy parameters
 
   var marks = [];
+  var marksLong = [];
   for (i = 0; i < data.move.length; i++) {
     marks.push({ value: i + 1, label: String(data.move[i] + "%") });
+    marksLong.push({ value: i, label: String(data.move[i] + "%") });
   }
 
   var marksTerms: any[] = [];
@@ -326,11 +344,11 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
             </p>
             <Slider
               name="enterLong"
-              defaultValue={3}
+              defaultValue={initEnterLong}
               step={1}
-              marks={marks}
-              min={1}
-              max={6}
+              marks={marksLong}
+              min={0}
+              max={5}
               onChange={handleEnterLong}
               valueLabelDisplay="auto"
             />
@@ -346,7 +364,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
             </p>
             <Slider
               name={"exitLong"}
-              defaultValue={0}
+              defaultValue={initExitLong}
               step={0.01}
               marks={[]}
               min={0}
@@ -367,7 +385,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
             </p>
             <Slider
               name={"exitShort"}
-              defaultValue={0}
+              defaultValue={initExitShort}
               step={0.01}
               marks={[]}
               min={-5}
@@ -388,7 +406,7 @@ const StrategiesLayout = ({ data }: StrategiesLayoutProps) => {
             </p>
             <Slider
               name={"enterShort"}
-              defaultValue={3}
+              defaultValue={initEnterShort}
               marks={marks}
               min={1}
               max={6}
