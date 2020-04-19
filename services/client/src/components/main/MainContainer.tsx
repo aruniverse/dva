@@ -7,15 +7,11 @@ type Component = FunctionComponent<any> | ComponentClass<any>;
 const withMainContainer = (Comp: Component) => (props: any) => {
   return (
     <div className="container">
-      <div className="sidebar_wrapper">
-        <div className="sidebar_container">
-          <Sidebar />
-        </div>
-        <div className="main_wrapper">
-          <div className="main_content">
-            <Comp {...props} />
-          </div>
-        </div>
+      <div className="sidebar_container">
+        <Sidebar />
+      </div>
+      <div className="main_container">
+        <Comp {...props} />
       </div>
     </div>
   );

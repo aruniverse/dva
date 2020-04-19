@@ -1,4 +1,5 @@
 import { StockAnalysis } from "../../types";
+<<<<<<< HEAD
 //import IndicatorsLayout from "./Indicators";
 import StrategiesLayout from "./Strategies";
 
@@ -58,3 +59,13 @@ const TestData = () => {
 }
 
 export default TestData;
+=======
+import IndicatorsLayout from "./Indicators";
+import { SampleData2 } from "../../data/sample2";
+
+const TestData = () => {
+  return IndicatorsLayout(SampleData2);
+};
+
+export default TestData;
+>>>>>>> d69b242e17cd29372489732dfc7d35792e1bdd27
