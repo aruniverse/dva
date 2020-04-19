@@ -53,6 +53,7 @@ export interface StockAnalysis {
   term: number[];
   move: number[];
   price: number[];
+  indicator_list:string[];
   strategy: Strategy;
   indicators: Indicators;
   predict: Predict;

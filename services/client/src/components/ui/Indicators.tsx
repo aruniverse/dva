@@ -27,18 +27,16 @@ interface IndicatorsLayoutProps {
 
 export const IndicatorsLayout = ({ data }: IndicatorsLayoutProps) => {
   var final: JSX.Element[] = [];
-  var term: any = "term_5";
   var doubleData = [];
   var key = "fasdklj";
   var keyPlot = 1098;
   var termType: string = "term_5";
   const p_values: string = "p_values";
 
-  var labelStrings: string[] = [];
+  var labelStrings: string[] = data.indicator_list;
   var labels: StringBoolean = {};
   Object.entries(data.indicators).forEach(([key, value]) => {
     labels[key] = true;
-    labelStrings.push(key);
   });
 
   const [predictionTerm, updateTerm] = useState(5);

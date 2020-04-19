@@ -1820,6 +1820,7 @@ export const SampleData1: StockAnalysis = {
       54.51215601119449,
     ],
   },
+  indicator_list: ["acc_dist_index", "chaikin_money_flow", "ease_of_move", "williams_r", "rel_strength"], 
   predict: {
     /*  indicator_list: [
       "acc_dist_index",
