@@ -1,17 +1,26 @@
 .container {
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
-.sidebar_wrapper {
+  // display: block;
+  // height: 100%;
+  // width: 100%;
+  // display: grid;
+  // grid-template-areas: "sidebar main main main main main";
 }
 
 .sidebar_container {
+  // grid-area: sidebar;
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 120px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  // background-color: #111; /* Black */
 }
 
-.main_wrapper {
-}
-
-.main_content {
+.main_container {
+  // grid-area: main;
+  margin-left: 120px; /* Same as the width of the sidebar */
+  // padding-left: 10px;
+  width: calc(100%-120px);
+  // width: 100%;
 }

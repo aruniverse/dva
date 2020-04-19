@@ -53,9 +53,9 @@ const LoadChart = () => {
     }
   };
 
-  //   useEffect(() => {
-  //     getData();
-  //   }, []);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
   const handleEnterLong = (event: any, value: number | number[]) => {
     if (typeof value == "number") {
@@ -368,5 +368,5 @@ const LoadChart = () => {
   );
 };
 
-// export default withMainContainer(LoadChart);
-export default LoadChart;
+export default withMainContainer(LoadChart);
+// export default LoadChart;
