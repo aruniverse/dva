@@ -1,20 +1,25 @@
 import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
-import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
+import {
+  CircularProgress,
+  Grid,
+  Button,
+  Input,
+  Backdrop,
+} from "@material-ui/core";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import axios from "axios";
+import axios, { Canceler } from "axios";
 import { FormatDate } from "../utils/FormatDate";
 import { IndicatorsLayout } from "./Indicators";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
-// const API_ENDPOINT =
-//   "http://dvateam128.webfactional.com/api/api/analysis/example";
-const API_ENDPOINT = "/api/analysis/example";
+const API_ENDPOINT = "https://dvateam128.webfactional.com/api/analysis/example";
+// const API_ENDPOINT = "/api/analysis/example";
 
 const IndicatorsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -25,27 +30,41 @@ const IndicatorsPage = () => {
   const [startDate, setStartDate] = useState<Date | null>(tempDate); // 3 months ago
   const [data, setData] = useState<StockAnalysis>();
 
-  const httpClient = axios.create();
-  // httpClient.defaults.timeout = 20000;
+  const httpClient = axios.create({
+    // baseURL: API_ENDPOINT,
+    // timeout: 60000,
+  });
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+  let cancel: any;
 
   const getData = async () => {
     setLoading(true);
-    const response = await httpClient.get(API_ENDPOINT, {
-      params: {
-        symbol: ticker,
-        start_date: FormatDate(startDate),
-        end_date: FormatDate(endDate),
-      },
-    });
-    const { status, statusText, data } = response;
-    console.log(response);
-    if (status == 200) {
-      setData(data);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      console.log(status, statusText);
-      throw new Error(statusText);
+    try {
+      const response = await httpClient.get(API_ENDPOINT, {
+        params: {
+          symbol: ticker,
+          start_date: FormatDate(startDate),
+          end_date: FormatDate(endDate),
+        },
+        // cancelToken: new CancelToken((c) => (cancel = c)),
+        cancelToken: source.token,
+      });
+      const { status, statusText, data } = response;
+      console.log(response);
+      if (status === 200) {
+        setData(data);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        console.log(status, statusText);
+        throw new Error(statusText);
+      }
+    } catch (err) {
+      if (axios.isCancel(err)) {
+        setLoading(false);
+        throw new Error(err);
+      }
     }
   };
 
@@ -88,17 +107,38 @@ const IndicatorsPage = () => {
               "aria-label": "change date",
             }}
           />
-          <Button
-            variant="contained"
-            onClick={() => getData()}
-            disabled={!ticker}
-          >
-            Run
-          </Button>
+          {!loading ? (
+            <Button
+              variant="contained"
+              onClick={() => getData()}
+              disabled={!ticker}
+              color="primary"
+            >
+              Run
+            </Button>
+          ) : (
+            // <Button
+            //   variant="contained"
+            //   // onClick={() => cancel("Operation canceled by the user.")}
+            //   onClick={() => source.cancel("Operation canceled by the user.")}
+            //   color="secondary"
+            // >
+            //   Cancel
+            // </Button>
+            <></>
+          )}
         </Grid>
       </MuiPickersUtilsProvider>
+      <p style={{ textAlign: "center" }}>
+        NOTE: The Start Date and End Date needs to be a minimum of 150 days
+        apart.
+      </p>
       {loading ? (
-        <CircularProgress style={{ alignContent: "center", height: "40px" }} />
+        <Backdrop open={loading}>
+          <CircularProgress
+            style={{ alignContent: "center", height: "40px" }}
+          />
+        </Backdrop>
       ) : (
         data && <IndicatorsLayout data={data} />
       )}
