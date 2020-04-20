@@ -16,13 +16,11 @@ Including another URLconf
 from stocks import urls
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic.base import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-]
-
-
-# Import from stocks app
-urlpatterns += [
     path('api/', include('stocks.urls')),
+    path('', TemplateView.as_view(template_name="index.html"))
 ]

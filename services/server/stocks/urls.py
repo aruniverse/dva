@@ -4,6 +4,7 @@ from stocks import views
 
 urlpatterns = [
     path('symbol/', views.symbol_list),
-    re_path(r'analysis$', views.symbol_detail),
+    re_path(r'analysis2$', views.symbol_detail),
     path('analysis/example', views.example),
+    path(r'analysis', views.analysis),
 ]
