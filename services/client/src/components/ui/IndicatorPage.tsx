@@ -106,8 +106,10 @@ const IndicatorsPage = () => {
         </Grid>
       </MuiPickersUtilsProvider>
       <p style={{ textAlign: "center" }}>
-        NOTE: The Start Date and End Date needs to be a minimum of 150 days
-        apart.
+        NOTE: The Start Date and End Date needs to be a minimum of 180 days
+        apart. The farther apart the dates are, the better the results. Good
+        Tickers to test with include "MSFT", "AAPL", "AMZN", "FB", "TSLA". Only
+        stocks traded on NASDAQ are allowed.
       </p>
       {loading ? (
         <Backdrop open={loading}>

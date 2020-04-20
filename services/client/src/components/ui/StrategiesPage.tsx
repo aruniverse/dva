@@ -28,7 +28,7 @@ const StrategiesPage = () => {
   const [ticker, setTicker] = useState("");
   const [endDate, setEndDate] = useState<Date | null>(new Date()); // today
   const tempDate = new Date();
-  tempDate?.setMonth(tempDate.getMonth() - 3);
+  tempDate?.setMonth(tempDate.getMonth() - 6);
   const [startDate, setStartDate] = useState<Date | null>(tempDate); // 3 months ago
   const [data, setData] = useState<StockAnalysis>();
 
@@ -105,6 +105,12 @@ const StrategiesPage = () => {
           </Button>
         </Grid>
       </MuiPickersUtilsProvider>
+      <p style={{ textAlign: "center" }}>
+        NOTE: The Start Date and End Date needs to be a minimum of 180 days
+        apart. The farther apart the dates are, the better the results. Good
+        Tickers to test with include "MSFT", "AAPL", "AMZN", "FB", "TSLA". Only
+        stocks traded on NASDAQ are allowed.
+      </p>
       {loading ? (
         <Backdrop open={loading}>
           <CircularProgress
