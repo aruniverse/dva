@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
-import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
+import {
+  CircularProgress,
+  Grid,
+  Button,
+  Input,
+  Backdrop,
+} from "@material-ui/core";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -13,16 +19,17 @@ import { IndicatorsLayout } from "./Indicators";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
 // const API_ENDPOINT =
-//   "http://dvateam128.webfactional.com/api/api/analysis/example";
-const API_ENDPOINT = "/api/analysis/example";
+//   "http://dvateam128.webfactional.com/api/analysis/example";
+// const API_ENDPOINT = "/api/analysis/example";
+const API_ENDPOINT = "/api/analysis";
 
 const IndicatorsPage = () => {
   const [loading, setLoading] = useState(false);
   const [ticker, setTicker] = useState("");
   const [endDate, setEndDate] = useState<Date | null>(new Date()); // today
   const tempDate = new Date();
-  tempDate?.setMonth(tempDate.getMonth() - 3);
-  const [startDate, setStartDate] = useState<Date | null>(tempDate); // 3 months ago
+  tempDate?.setMonth(tempDate.getMonth() - 6);
+  const [startDate, setStartDate] = useState<Date | null>(tempDate); // 6 months ago
   const [data, setData] = useState<StockAnalysis>();
 
   const httpClient = axios.create();
@@ -92,13 +99,22 @@ const IndicatorsPage = () => {
             variant="contained"
             onClick={() => getData()}
             disabled={!ticker}
+            color="primary"
           >
             Run
           </Button>
         </Grid>
       </MuiPickersUtilsProvider>
+      <p style={{ textAlign: "center" }}>
+        NOTE: The Start Date and End Date needs to be a minimum of 150 days
+        apart.
+      </p>
       {loading ? (
-        <CircularProgress style={{ alignContent: "center", height: "40px" }} />
+        <Backdrop open={loading}>
+          <CircularProgress
+            style={{ alignContent: "center", height: "40px" }}
+          />
+        </Backdrop>
       ) : (
         data && <IndicatorsLayout data={data} />
       )}

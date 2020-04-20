@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import withMainContainer from "../main/MainContainer";
 import { StockAnalysis } from "../../types";
-import { CircularProgress, Grid, Button, Input } from "@material-ui/core";
+import {
+  CircularProgress,
+  Grid,
+  Button,
+  Input,
+  Backdrop,
+} from "@material-ui/core";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -13,8 +19,9 @@ import { FormatDate } from "../utils/FormatDate";
 
 // const API_ENDPOINT = "http://dvateam128.webfactional.com/api/analysis";
 // const API_ENDPOINT =
-//   "http://dvateam128.webfactional.com/api/api/analysis/example";
-const API_ENDPOINT = "/api/analysis/example";
+//   "http://dvateam128.webfactional.com/api/analysis/example";
+// const API_ENDPOINT = "/api/analysis/example";
+const API_ENDPOINT = "/api/analysis";
 
 const StrategiesPage = () => {
   const [loading, setLoading] = useState(false);
@@ -90,16 +97,20 @@ const StrategiesPage = () => {
           />
           <Button
             variant="contained"
-            style={{ justifySelf: "left" }}
             onClick={() => getData()}
             disabled={!ticker}
+            color="primary"
           >
             Run
           </Button>
         </Grid>
       </MuiPickersUtilsProvider>
       {loading ? (
-        <CircularProgress style={{ alignContent: "center", height: "40px" }} />
+        <Backdrop open={loading}>
+          <CircularProgress
+            style={{ alignContent: "center", height: "40px" }}
+          />
+        </Backdrop>
       ) : (
         data && <StrategiesLayout data={data} />
       )}
