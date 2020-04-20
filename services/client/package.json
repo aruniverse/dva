@@ -40,8 +40,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build && yarn run copy:build && yarn run copy:static && yarn run copy:build:webfaction && yarn run copy:static:webfaction",
     "build:only": "react-scripts build",
-    "copy:build": "rimraf \"../server/server/build/\" && cpx \"build/*.*\" \"../server/server/build/\" -v -u",
-    "copy:static": "rimraf \"../server/server/static/\" && cpx \"build/static/**\" \"../server/server/static/\" -v -u",
+    "copy:build": "rimraf \"../server/build/\" && cpx \"build/*.*\" \"../server/build/\" -v -u",
+    "copy:static": "rimraf \"../server/static/\" && cpx \"build/static/**\" \"../server/static/\" -v -u",
     "copy:build:webfaction": "rimraf \"../webfaction/myproject/build/\" && cpx \"build/*.*\" \"../webfaction/myproject/build/\" -v -u",
     "copy:static:webfaction": "rimraf \"../webfaction/myproject/static/\" && cpx \"build/static/**\" \"../webfaction/myproject/static/\" -v -u"
   },
