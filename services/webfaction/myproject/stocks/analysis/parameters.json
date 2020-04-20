@@ -1,0 +1,60 @@
+{ 
+"term": [
+	5,15,40
+],
+"move": [
+	-5,-3,-1,1,3,5
+],
+"indicator":{
+	"acc_dist_index": {
+	  "name": "Accumulation/distribution index",
+	  "include": true,
+	  "parameters": {}
+	},
+	"chaikin_money_flow": {
+	  "name": "Chaikin money flow",
+	  "include": true,
+	  "parameters": {
+		"period":20 
+	  }
+	},
+	"ease_of_move": {
+	  "name": "Ease of movement",
+	  "include": true,
+	  "parameters": {
+		"period":14
+	  }
+	},
+	"williams_r":{
+	  "name": "Williams %R",
+	  "include": true,
+	  "parameters": {
+		"period":14
+	  }
+	},
+	"rel_strength":{
+	  "name": "Relative strength index",
+	  "include": true,
+	  "parameters": {
+		"period":14
+	  }
+	}
+},
+"strategy":{
+"bollinger":{
+	"name": "Bollinger band",
+	"include":true,
+	"parameters":{
+		"period":20,
+		"num_dev":2
+		}
+	},
+"williams_r":{
+	"name": "Williams %R",
+	"include":true,
+	"parameters":{
+		"period":14
+		}
+	}
+  }
+}
