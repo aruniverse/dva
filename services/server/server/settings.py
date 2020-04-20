@@ -26,7 +26,7 @@ SECRET_KEY = 'y2ta_46*i#z#bqdbw!_dg@kr86vc2&wva)b-&myyc&1jj_vpbn'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -51,7 +51,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'corsheaders.middleware.CorsMiddleware',
 ]
 
 
@@ -60,6 +59,7 @@ ROOT_URLCONF = 'server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'build')],
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -128,10 +128,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'assets'),
-# )
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_PARSER_CLASSES': [
