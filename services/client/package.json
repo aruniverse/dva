@@ -38,8 +38,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && yarn run copy:build && yarn run copy:static",
-    "copy:build": "cpx \"build/*.*\" \"../server/build/\" -v -u",
-    "copy:static": "cpx \"build/static/**\" \"../server/static/\" -v -u"
+    "copy:build": "rimraf \"../server/build/\" && cpx \"build/*.*\" \"../server/build/\" -v -u",
+    "copy:static": "rimraf \"../server/static/\" && cpx \"build/static/**\" \"../server/static/\" -v -u"
   },
   "eslintConfig": {
     "extends": "react-app"
